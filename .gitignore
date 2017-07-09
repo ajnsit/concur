@@ -1,0 +1,16 @@
+TAGS
+dist
+*~
+tmp
+_darcs
+*.old.hs
+*.hi
+*.o
+tags
+cabal.config
+cabal.sandbox.config
+.cabal-sandbox
+.stack-work
+dist-stack
+vendor
+
