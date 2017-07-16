@@ -1,4 +1,4 @@
-module Concur.Concurrent
+module Concur.Notify
   ( Notify (..)
   , newNotify
   ) where

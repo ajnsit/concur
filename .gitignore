@@ -13,4 +13,4 @@ cabal.sandbox.config
 .stack-work
 dist-stack
 vendor
-
+node_modules

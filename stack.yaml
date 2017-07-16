@@ -1,6 +1,13 @@
 resolver: lts-7.19
 packages:
 - '.'
-extra-deps: []
+extra-deps:
+- ghcjs-dom-0.9.1.1
+- jsaddle-0.9.3.0
+- jsaddle-warp-0.9.3.0
+- ghcjs-dom-jsaddle-0.9.1.0
+- ref-tf-0.4.0.1
+- jsaddle-dom-0.9.1.0
+- jsaddle-wkwebview-0.9.0.0
 flags: {}
 extra-package-dbs: []
