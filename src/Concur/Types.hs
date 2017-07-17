@@ -6,6 +6,8 @@ module Concur.Types
   , continue
   , widget
   , display
+  , never
+  , mapView
   , pass
   , retry
   , Suspend
@@ -20,7 +22,7 @@ module Concur.Types
 import           Control.Applicative    (Alternative, empty, (<|>))
 import           Control.Concurrent     (forkIO, killThread)
 import           Control.Monad          (MonadPlus (..))
-import           Control.Monad.Free     (Free (..), liftF)
+import           Control.Monad.Free     (Free (..), hoistFree, liftF)
 import           Control.Monad.IO.Class (MonadIO, liftIO)
 
 import           Concur.Notify          (await, newNotify, notify)
@@ -55,6 +57,15 @@ widget v r = continue $ Suspend v r
 display :: v -> Widget v a
 display v = widget v Nothing
 
+-- Never returns, use as an identity for <|>
+never :: Monoid v => Widget v a
+never = display mempty
+
+mapView :: (v -> v) -> Widget v a -> Widget v a
+mapView f (Widget w) = Widget $ go w
+  where
+    go = hoistFree $ \s -> Suspend (f $ view s) (cont s)
+
 -- This is probably useful for realtime systems only (i.e. not DOM, but maybe so for terminal)
 -- This is like `return`, but is delayed by 1 cycle (i.e. is a Free instead of a Pure), so it doesn't immediately override anything else <|> with it, and allows things <|> with it to display their views (albeit momentarily)
 pass :: Monoid v => a -> Widget v a
@@ -87,17 +98,17 @@ instance Monoid v => Alternative (Widget v) where
           (Just iof, Nothing) -> Just $ fmap (`comb` gss) <$> iof
           (Just iof, Just iog) -> Just $ do
             n <- newNotify
-            ft <- forkIO $ iof >>= notify n . (True,)
-            gt <- forkIO $ iog >>= notify n . (False,)
+            ft <- forkIO $ iof >>= notify n . Left
+            gt <- forkIO $ iog >>= notify n . Right
             res <- await n
             -- This indiscriminate culling is probably a bad thing
             killThread ft
             killThread gt
             -- end massacre
             return $ case res of
-              (_, NoChange)      -> NoChange
-              (True, Change f')  -> Change $ comb f' gss
-              (False, Change g') -> Change $ comb fss g'
+              Left (Change f')  -> Change $ comb f' gss
+              Right (Change g') -> Change $ comb fss g'
+              _                 -> NoChange
 
 -- The default instance derives from Alternative
 instance Monoid v => MonadPlus (Widget v)
