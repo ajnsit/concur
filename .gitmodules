@@ -3,4 +3,4 @@
 	url = https://github.com/ghcjs/ghcjs-ffiqq.git
 [submodule "ghcjs-vdom"]
 	path = ghcjs-vdom
-	url = https://github.com/ghcjs/ghcjs-vdom.git
+	url = https://github.com/ajnsit/ghcjs-vdom.git
