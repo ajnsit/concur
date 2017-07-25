@@ -6,26 +6,13 @@ module Concur.Run where
 import           Control.Monad          (void)
 import           Control.Monad.Free     (Free (..))
 import           Control.Monad.IO.Class (MonadIO (..))
+import           Control.Concurrent.STM (atomically, retry)
 
 import           GHCJS.DOM.Types        (JSM)
-import           GHCJS.Foreign.QQ       (js, js_)
+import           GHCJS.Foreign.QQ       (js)
 import           GHCJS.VDOM             (VNode, DOMNode, diff, mount, patch)
 import qualified GHCJS.VDOM.Element     as E
--- import qualified GHCJS.VDOM.Event       as Ev
-
-import GHCJS.DOM.Types (JSM)
-import           GHCJS.Foreign.QQ
-import           GHCJS.Types
-
-import qualified GHCJS.VDOM.Component    as C
-import qualified GHCJS.VDOM.DOMComponent as D
-import qualified GHCJS.VDOM.Attribute    as A
-import qualified GHCJS.VDOM.Element      as E
-import qualified GHCJS.VDOM.Event        as Ev
-import           GHCJS.VDOM
-import           GHCJS.VDOM.QQ
-
-
+import qualified GHCJS.VDOM.Event       as Ev
 
 import           Concur.Types
 
@@ -40,7 +27,9 @@ import Language.Javascript.JSaddle.WebKitGTK (run)
 
 
 -- HTML structure
-type HTML = [VNode]
+type HTML = [HTMLNode]
+type HTMLNode = VNode
+type HTMLNodeName attrs = attrs -> HTML -> HTMLNode
 
 initConcur :: JSM ()
 initConcur = Ev.initEventDelegation Ev.defaultEvents
@@ -56,13 +45,17 @@ runWidget (Widget w) root = do
   go m w
   where
     go mnt w' = do
-      let
-        stepToWidget NoChange   = w'
-        stepToWidget (Change a) = a
       case w' of
-        Pure a -> return a
+        Pure a -> liftIO (putStrLn "WARNING: Application exited: This may have been unintentional!") >> return a
         Free ws -> do
           void $ diff mnt (E.div () $ view ws) >>= patch mnt
           case cont ws of
-            Nothing -> Prelude.error "WARNING: Application exited: This is usually an error!"
-            Just m  -> liftIO m >>= go mnt . stepToWidget
+            Nothing -> Prelude.error "ERROR: Application suspended indefinitely: This is usually a logic error!"
+            Just m  ->
+              let m' = atomically $ do
+                    v <- m
+                    case v of
+                      Retry -> retry
+                      NoChange -> return w'
+                      Change a -> return a
+              in liftIO m' >>= go mnt

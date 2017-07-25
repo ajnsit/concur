@@ -8,24 +8,22 @@ module Concur.Types
   , display
   , never
   , mapView
+  , wrapView
   , pass
-  , retry
+  , restart
   , Suspend
   , view
   , cont
   , Effect
-  , io
   , effect
   , Step(..)
   ) where
 
 import           Control.Applicative    (Alternative, empty, (<|>))
-import           Control.Concurrent     (forkIO, killThread)
+import           Control.Concurrent.STM (STM)
 import           Control.Monad          (MonadPlus (..))
 import           Control.Monad.Free     (Free (..), hoistFree, liftF)
-import           Control.Monad.IO.Class (MonadIO, liftIO)
-
-import           Concur.Notify          (await, newNotify, notify)
+import           Control.MonadSTM       (MonadSTM (..))
 
 -------------
 -- WIDGETS --
@@ -40,10 +38,11 @@ data Suspend v a = Suspend { view :: v, cont :: Effect a }
 -- Nothing means no effects
 --   This is an error at the top level,
 --   and must be <|> with another widget to be useful
-type Effect a = Maybe (IO (Step a))
+type Effect a = Maybe (STM (Step a))
 
 data Step a
-  = NoChange
+  = Retry
+  | NoChange
 --  | Err String
   | Change a
   deriving Functor
@@ -61,31 +60,42 @@ display v = widget v Nothing
 never :: Monoid v => Widget v a
 never = display mempty
 
-mapView :: (v -> v) -> Widget v a -> Widget v a
+-- Change the view of a Widget
+mapView :: (u -> v) -> Widget u a -> Widget v a
 mapView f (Widget w) = Widget $ go w
   where
     go = hoistFree $ \s -> Suspend (f $ view s) (cont s)
 
+-- Generic widget view wrapper
+wrapView :: Applicative f => (u -> v) -> Widget u a -> Widget (f v) a
+wrapView f = mapView (pure . f)
+
 -- This is probably useful for realtime systems only (i.e. not DOM, but maybe so for terminal)
 -- This is like `return`, but is delayed by 1 cycle (i.e. is a Free instead of a Pure), so it doesn't immediately override anything else <|> with it, and allows things <|> with it to display their views (albeit momentarily)
 pass :: Monoid v => a -> Widget v a
-pass a = effect $ Just $ return $ Change a
+pass a = widget mempty $ Just $ return $ Change a
 
 -- This is probably useful for realtime systems only (i.e. not DOM, but maybe so for terminal)
 -- <|> with this immediately restarts the entire computation
-retry :: Monoid v => Widget v a
-retry = effect $ Just $ return NoChange
+restart :: Monoid v => Widget v a
+restart = widget mempty $ Just $ return NoChange
 
-io :: v -> IO a -> Widget v a
-io v m = widget v $ Just $ Change <$> m
+effect :: v -> STM (Maybe a) -> Widget v a
+effect v m = widget v $ Just $ do
+  val <- m
+  case val of
+    Nothing -> return Retry
+    Just a  -> return $ Change a
 
-effect :: Monoid v => Effect a -> Widget v a
-effect = widget mempty
+-- IMPORTANT NOTE: Be careful with this! If this blocks, it can break the rest of the app.
+-- TODO: Perhaps hide this from the user code.
+instance Monoid v => MonadSTM (Widget v) where
+  liftSTM m = widget mempty $ Just $ Change <$> m
 
 -- IMPORTANT NOTE: This Alternative instance is NOT the same one as that for Free.
 -- That one simply uses Alternative for Suspend. But that one isn't sufficient for us.
 instance Monoid v => Alternative (Widget v) where
-  empty = display mempty
+  empty = never
   Widget f <|> Widget g = Widget $ comb f g
     where
       comb :: Monoid v => Free (Suspend v) a -> Free (Suspend v) a -> Free (Suspend v) a
@@ -94,24 +104,20 @@ instance Monoid v => Alternative (Widget v) where
       comb fss@(Free fs) gss@(Free gs) = Free $ Suspend (view fs `mappend` view gs) $
         case (cont fs, cont gs) of
           (Nothing, Nothing) -> Nothing
-          (Nothing, Just iog) -> Just $ fmap (comb fss) <$> iog
-          (Just iof, Nothing) -> Just $ fmap (`comb` gss) <$> iof
-          (Just iof, Just iog) -> Just $ do
-            n <- newNotify
-            ft <- forkIO $ iof >>= notify n . Left
-            gt <- forkIO $ iog >>= notify n . Right
-            res <- await n
-            -- This indiscriminate culling is probably a bad thing
-            killThread ft
-            killThread gt
-            -- end massacre
-            return $ case res of
-              Left (Change f')  -> Change $ comb f' gss
-              Right (Change g') -> Change $ comb fss g'
-              _                 -> NoChange
+          (Nothing, Just mg) -> Just $ fmap (comb fss) <$> mg
+          (Just mf, Nothing) -> Just $ fmap (`comb` gss) <$> mf
+          (Just mf, Just mg) -> Just $ do
+            -- It's very important that mf NOT block
+            vf <- mf
+            case vf of
+              NoChange -> return NoChange
+              Change f' -> return $ Change $ comb f' gss
+              Retry -> do
+                vg <- mg
+                case vg of
+                  NoChange  -> return NoChange
+                  Change g' -> return $ Change $ comb fss g'
+                  Retry     -> return Retry
 
 -- The default instance derives from Alternative
 instance Monoid v => MonadPlus (Widget v)
-
-instance Monoid v => MonadIO (Widget v) where
-  liftIO = io mempty
