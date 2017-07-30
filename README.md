@@ -19,5 +19,8 @@ This library was originally conceived as a way to improve Elm by adding -
 5. Eliminating the difference between state modification and view rendering. So a new widget can be simply - `div (class_ "hello") [text "Here are some widgets", counter, someOtherWidget]`. This wires up both the view rendering and the action handling for all nested widgets, without having to manually manage each separately.
 
 ## Examples
+
+NOTE: You can see the examples in action at - https://ajnsit.github.io/concur/
+
 1. [Click Counting Example](examples/ClickCounter.hs) - Count total number of clicks, with a button that also increments the click count by 10.
 2. [TodoMVC Example](examples/Todos.hs) - The canonical TodoMVC example, with views modeled after the one in Elm. It works just like the Elm example but does not have CSS.
