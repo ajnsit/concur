@@ -61,11 +61,11 @@ delay i = io $ threadDelay (i*1000000)
 
 -- A clickable button widget
 button :: String -> Widget HTML ()
-button s = clickEl E.button [] [text s]
+button s = clickEl E.button [] (const ()) [text s]
 
--- An Element which can be clicked. This requires that the children never return.
-clickEl :: HTMLNodeName [A.Attribute] -> [A.Attribute] -> [Widget HTML Void] -> Widget HTML ()
-clickEl e attrs children = either (const ()) absurd <$> elEvent Ev.click e attrs (orr children)
+-- An Element which can be clicked
+clickEl :: HTMLNodeName [A.Attribute] -> [A.Attribute] -> (Ev.MouseEvent -> a) -> [Widget HTML a] -> Widget HTML a
+clickEl e attrs onClick children = either onClick id <$> elEvent Ev.click e attrs (orr children)
 
 -- Handle arbitrary events on an element.
 -- Returns Right on child events, and Left on event
@@ -81,15 +81,15 @@ elEvent evt e attrs w = do
   fmap Left wEvt <|> fmap Right child
 
 -- A text label which can be edited by double clicking.
-editableText :: String -> Widget HTML String
-editableText s = elEvent Ev.dblclick E.span [] (text s) >> inputEnter s
+editableText :: [A.Attribute] -> String -> Widget HTML String
+editableText attrs s = elEvent Ev.dblclick E.span attrs (text s) >> inputEnter attrs s
 
 -- Text input. Returns the contents on keypress enter.
-inputEnter :: String -> Widget HTML String
-inputEnter def = do
+inputEnter :: [A.Attribute] -> String -> Widget HTML String
+inputEnter attrs def = do
   n <- liftSTM newNotify
   let handleKeypress e = atomically $ when (Ev.key e == "Enter") $ notify n $ JSS.unpack $ Ev.inputValue e
-  let txt = E.input (A.value $ JSS.pack def, Ev.keydown handleKeypress) ()
+  let txt = E.input (Ev.keydown handleKeypress : attrs) ()
   effect [txt] $ fetch n
 
 -- Text input. Returns the contents on every change.

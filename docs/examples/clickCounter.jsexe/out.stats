@@ -1,0 +1,118 @@
+code size summary per package:
+
+base:                    310446
+concur-0.1.0.0-DIHpXIeTxaT9bLoTSpI4sv:36381
+deepseq-1.4.2.0-47yvsc92PQF1rYmebWoAXZ:878
+free-4.12.4-4DU15KXPdzZ2FhNPNvDKhk:2488
+ghc-prim:                6273
+ghcjs-base-0.2.0.0-GiGsdYOoO5CISyJ2m7ax9F:5134
+ghcjs-dom-jsffi-0.9.1.1-4r6dRcUIw47A7e5k5SpSHT:15653
+ghcjs-prim-0.1.0.0-IFhsWclGfLr1HfhUvIVylA:11379
+ghcjs-vdom-0.2.0.0-5TH3hPDqDyVDx6nAIZe9ys:19319
+integer-gmp:             2311
+main:                    15192
+
+
+code size per module:
+
+base
+    Control.Exception.Base:             2909
+    Data.Either:                        369
+    Data.Maybe:                         194
+    Data.OldList:                       1011
+    Data.Traversable:                   1635
+    Data.Typeable:                      878
+    Data.Typeable.Internal:             2335
+    Foreign.C.Error:                    9569
+    Foreign.C.String:                   1533
+    Foreign.Marshal.Alloc:              301
+    Foreign.Marshal.Array:              1987
+    Foreign.Storable:                   9380
+    GHC.Base:                           7621
+    GHC.Conc.Sync:                      4428
+    GHC.Enum:                           210
+    GHC.Err:                            259
+    GHC.Exception:                      12448
+    GHC.Fingerprint:                    1459
+    GHC.Fingerprint.Type:               724
+    GHC.Foreign:                        12172
+    GHC.ForeignPtr:                     1459
+    GHC.IO:                             3504
+    GHC.IO.Buffer:                      1241
+    GHC.IO.BufferedIO:                  850
+    GHC.IO.Device:                      1248
+    GHC.IO.Encoding:                    958
+    GHC.IO.Encoding.Failure:            617
+    GHC.IO.Encoding.Latin1:             1869
+    GHC.IO.Encoding.Types:              983
+    GHC.IO.Encoding.UTF8:               60752
+    GHC.IO.Exception:                   20507
+    GHC.IO.FD:                          34543
+    GHC.IO.Handle:                      296
+    GHC.IO.Handle.FD:                   7437
+    GHC.IO.Handle.Internals:            40618
+    GHC.IO.Handle.Text:                 15616
+    GHC.IO.Handle.Types:                3715
+    GHC.Int:                            755
+    GHC.List:                           704
+    GHC.MVar:                           174
+    GHC.Ptr:                            610
+    GHC.STRef:                          180
+    GHC.Show:                           4681
+    GHC.Stack.CCS:                      3971
+    GHC.Stack.Types:                    1491
+    GHC.Storable:                       1070
+    GHC.TopHandler:                     12934
+    GHC.Word:                           923
+    System.Posix.Internals:             15318
+
+concur-0.1.0.0-DIHpXIeTxaT9bLoTSpI4sv
+    Concur.Notify:                      1080
+    Concur.Run:                         6059
+    Concur.Types:                       10929
+    Concur.Widgets:                     18313
+
+deepseq-1.4.2.0-47yvsc92PQF1rYmebWoAXZ
+    Control.DeepSeq:                    878
+
+free-4.12.4-4DU15KXPdzZ2FhNPNvDKhk
+    Control.Monad.Free:                 2488
+
+ghc-prim
+    GHC.CString:                        1862
+    GHC.IntWord64:                      298
+    GHC.Tuple:                          2617
+    GHC.Types:                          1496
+
+ghcjs-base-0.2.0.0-GiGsdYOoO5CISyJ2m7ax9F
+    Data.JSString:                      3850
+    Data.JSString.Internal.Type:        266
+    GHCJS.Marshal.Internal:             1018
+
+ghcjs-dom-jsffi-0.9.1.1-4r6dRcUIw47A7e5k5SpSHT
+    GHCJS.DOM:                          441
+    GHCJS.DOM.EventM:                   1274
+    GHCJS.DOM.EventTargetClosures:      911
+    GHCJS.DOM.JSFFI.Generated.GlobalEventHandlers:711
+    GHCJS.DOM.Types:                    12316
+
+ghcjs-prim-0.1.0.0-IFhsWclGfLr1HfhUvIVylA
+    GHCJS.Prim:                         6355
+    GHCJS.Prim.Internal:                4297
+    GHCJS.Prim.Internal.Build:          727
+
+ghcjs-vdom-0.2.0.0-5TH3hPDqDyVDx6nAIZe9ys
+    GHCJS.VDOM.Event:                   11246
+    GHCJS.VDOM.Internal.Thunk:          5862
+    GHCJS.VDOM.Internal.Types:          2211
+
+integer-gmp
+    GHC.Integer.Type:                   2311
+
+main
+    Main:                               15192
+
+
+
+packed metadata: 106653
+
