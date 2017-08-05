@@ -1,15 +1,15 @@
 code size summary per package:
 
-base:                    311755
-concur-0.1.0.0-DIHpXIeTxaT9bLoTSpI4sv:38706
+base:                    312292
+concur-0.1.0.0-LTn3JHKtLfg89Zi9npyAR1:38252
 deepseq-1.4.2.0-47yvsc92PQF1rYmebWoAXZ:878
 free-4.12.4-4DU15KXPdzZ2FhNPNvDKhk:2488
-ghc-prim:                6314
-ghcjs-base-0.2.0.0-GiGsdYOoO5CISyJ2m7ax9F:4271
+ghc-prim:                6528
+ghcjs-base-0.2.0.0-GiGsdYOoO5CISyJ2m7ax9F:4691
 ghcjs-prim-0.1.0.0-IFhsWclGfLr1HfhUvIVylA:11379
 ghcjs-vdom-0.2.0.0-5TH3hPDqDyVDx6nAIZe9ys:19148
 integer-gmp:             2311
-main:                    111267
+main:                    117477
 
 
 code size per module:
@@ -21,12 +21,13 @@ base
     Data.OldList:                       1011
     Data.Typeable:                      878
     Data.Typeable.Internal:             2335
+    Data.Void:                          65
     Foreign.C.Error:                    9569
     Foreign.C.String:                   1533
     Foreign.Marshal.Alloc:              301
     Foreign.Marshal.Array:              1987
     Foreign.Storable:                   9380
-    GHC.Base:                           6949
+    GHC.Base:                           7419
     GHC.Conc.Sync:                      4428
     GHC.Enum:                           1596
     GHC.Err:                            259
@@ -62,13 +63,13 @@ base
     GHC.Storable:                       1070
     GHC.TopHandler:                     12934
     GHC.Word:                           923
-    System.Posix.Internals:             15318
+    System.Posix.Internals:             15320
 
-concur-0.1.0.0-DIHpXIeTxaT9bLoTSpI4sv
-    Concur.Notify:                      315
-    Concur.Run:                         6059
-    Concur.Types:                       10929
-    Concur.Widgets:                     21403
+concur-0.1.0.0-LTn3JHKtLfg89Zi9npyAR1
+    Concur.Notify:                      1458
+    Concur.Run:                         6841
+    Concur.Types:                       10442
+    Concur.Widgets:                     19511
 
 deepseq-1.4.2.0-47yvsc92PQF1rYmebWoAXZ
     Control.DeepSeq:                    878
@@ -78,13 +79,13 @@ free-4.12.4-4DU15KXPdzZ2FhNPNvDKhk
 
 ghc-prim
     GHC.CString:                        1862
-    GHC.Classes:                        207
+    GHC.Classes:                        421
     GHC.IntWord64:                      298
     GHC.Tuple:                          2617
     GHC.Types:                          1330
 
 ghcjs-base-0.2.0.0-GiGsdYOoO5CISyJ2m7ax9F
-    Data.JSString:                      3850
+    Data.JSString:                      4270
     Data.JSString.Internal.Type:        421
 
 ghcjs-prim-0.1.0.0-IFhsWclGfLr1HfhUvIVylA
@@ -101,9 +102,9 @@ integer-gmp
     GHC.Integer.Type:                   2311
 
 main
-    Main:                               111267
+    Main:                               117477
 
 
 
-packed metadata: 116352
+packed metadata: 116498
 

@@ -5,7 +5,7 @@ import Control.Monad.State (StateT, mapStateT)
 import Control.Monad.Trans.Identity (IdentityT, mapIdentityT)
 
 class MonadTransMap t where
-  liftMap :: (forall a. m a -> m a) -> t m a -> t m a
+  liftMap :: (forall x. m x -> m x) -> t m a -> t m a
 
 instance MonadTransMap IdentityT where
   liftMap = mapIdentityT

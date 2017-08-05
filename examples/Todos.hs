@@ -5,17 +5,19 @@ module Main where
 import           Control.Monad        (forever, void)
 import           Control.Monad.State  (StateT, execStateT, get, lift, put)
 
+import qualified Data.JSString        as JSS
 import           Data.List            (intersperse)
 import           Data.String          (fromString)
+import           Data.Void
 
 import qualified GHCJS.VDOM.Attribute as A
 import qualified GHCJS.VDOM.Element   as E
 import qualified GHCJS.VDOM.Event     as Ev
 
-import           Concur               (HTML, Widget, button, classList, clickEl,
-                                       el, elT, elT_, el_, initConcur,
-                                       orr, runWidgetInBody, inputEnter, text, editableText,
-                                       elEvent)
+import           Concur               (HTML, Widget, classList, clickEl, el,
+                                       elEvent, elT, elT_, el_, initConcur,
+                                       inputEnter, never, orr, runWidgetInBody,
+                                       text)
 
 main :: IO ()
 main = do
@@ -74,15 +76,13 @@ widgetTodos = forever $ elT E.div [ A.class_ "todomvc-wrapper" ]
         ]
   ]
 
--- <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
-
 widgetInput :: EntriesWidget ()
 widgetInput = elT E.header
   [ A.class_ "header" ]
   [ elT E.h1 [] [lift $ text "todos"]
   , do
       elist <- get
-      s <- lift $ inputEnter [A.class_ "new-todo", A.placeholder "What needs to be done?", A.autofocus "autofocus", A.name "newTodo", A.value ""] ""
+      s <- lift $ inputEnter [A.class_ "new-todo", A.placeholder "What needs to be done?", A.autofocus "autofocus", A.name "newTodo", A.value ""]
       put $ elist { entriesList = Entry s False : entriesList elist }
   ]
 
@@ -110,20 +110,25 @@ widgetEntries = do
     allCompleted elist = entriesLeft elist <= 0
     markAllComplete v elist = elist { entriesList = map (\e -> e {entryCompleted = v}) (entriesList elist) }
 
--- <div class="view"><input class="toggle" type="checkbox"><label>haha</label><button class="destroy"></button></div>
 
--- <li class=""><div class="view"><input class="toggle" type="checkbox"><label>haha</label><button class="destroy"></button></div><input class="edit" name="title" id="todo-2"></li>
 widgetEntry :: Entry -> Widget HTML (Maybe Entry)
-widgetEntry todo = el_ E.li [ classList [ ("completed", entryCompleted todo), ("editing", False) ] ] $
-  el E.div [ A.class_ "view" ] $
-    [ clickEl E.input (addChecked (entryCompleted todo) [A.type_ "checkbox", A.class_ "toggle"])
-        (\_e -> Just $ todo { entryCompleted = not $ entryCompleted todo }) []
-    , fmap (\desc' -> Just $ todo { entryDescription = desc' }) $ do
-        elEvent Ev.dblclick E.label [] (text desc)
-        inputEnter [A.class_ "edit", A.name "title"] desc
-    , clickEl E.button [A.class_ "destroy"] (const Nothing) []
-    ]
+widgetEntry todo = go False
   where
+    go editing = ego editing >>= either go return
+    ego editing = do
+      el E.li [ classList [ ("completed", completed), ("editing", editing) ] ] $
+        [ el E.div [ A.class_ "view" ] $
+            [ clickEl E.input (addChecked completed [A.type_ "checkbox", A.class_ "toggle"])
+                (\_e -> Right $ Just $ todo { entryCompleted = not completed }) []
+            , either (const $ Left $ not editing) absurd <$> elEvent Ev.dblclick E.label [] (text desc)
+            , clickEl E.button [A.class_ "destroy"] (const $ Right Nothing) []
+            ]
+        , if editing
+            then fmap (\desc' -> Right $ Just $ todo { entryDescription = desc' }) $
+                   inputEnter [A.autofocus "autofocus", A.class_ "edit", A.name "title", A.value $ JSS.pack desc]
+            else never
+        ]
+    completed = entryCompleted todo
     desc = entryDescription todo
     addChecked v l = if v then (A.checked "checked" : l) else l
 

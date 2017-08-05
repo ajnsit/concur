@@ -22,5 +22,7 @@ This library was originally conceived as a way to improve Elm by adding -
 
 NOTE: You can see the examples in action at - https://ajnsit.github.io/concur/
 
-1. [Click Counting Example](examples/ClickCounter.hs) - Count total number of clicks, with a button that also increments the click count by 10.
-2. [TodoMVC Example](examples/Todos.hs) - The canonical TodoMVC example, with views modeled after the one in Elm. It works just like the Elm example but does not have CSS.
+1. [Click Counting Example](examples/ClickCounter.hs) - [Demo](https://ajnsit.github.io/concur/examples/clickCounter.jsexe/index.html) - Count total number of clicks on the page, with a button that increments the click count by 10, and also autoincrement clicks every second.
+2. [TodoMVC Example](examples/Todos.hs) - [Demo](https://ajnsit.github.io/concur/examples/todos.jsexe/index.html) - The canonical TodoMVC example, with views modeled after the one in Elm.
+3. [Mario Example](examples/Mario.hs) - [Demo](https://ajnsit.github.io/concur/examples/mario.jsexe/index.html) - Port of the Mario example from Elm.
+

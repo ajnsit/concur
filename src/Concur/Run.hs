@@ -6,7 +6,9 @@ module Concur.Run where
 import           Control.Monad          (void)
 import           Control.Monad.Free     (Free (..))
 import           Control.Monad.IO.Class (MonadIO (..))
-import           Control.Concurrent.STM (atomically, retry)
+import           Control.Concurrent.STM (atomically)
+
+import           Data.Maybe             (fromMaybe)
 
 import           GHCJS.DOM.Types        (JSM)
 import           GHCJS.Foreign.QQ       (js)
@@ -40,8 +42,11 @@ runWidgetInBody w = do
   runWidget w root
 
 runWidget :: Widget HTML a -> DOMNode -> JSM a
-runWidget (Widget w) root = do
-  m <- mount root (E.div () ())
+runWidget w root = runWidgetLoading w root (E.div () ())
+
+runWidgetLoading :: Widget HTML a -> DOMNode -> HTMLNode -> JSM a
+runWidgetLoading (Widget w) root loading = do
+  m <- mount root loading
   go m w
   where
     go mnt w' = do
@@ -49,13 +54,7 @@ runWidget (Widget w) root = do
         Pure a -> liftIO (putStrLn "WARNING: Application exited: This may have been unintentional!") >> return a
         Free ws -> do
           void $ diff mnt (E.div () $ view ws) >>= patch mnt
+          liftIO $ fromMaybe (return ()) $ runIO ws
           case cont ws of
             Nothing -> Prelude.error "ERROR: Application suspended indefinitely: This is usually a logic error!"
-            Just m  ->
-              let m' = atomically $ do
-                    v <- m
-                    case v of
-                      Retry -> retry
-                      NoChange -> return w'
-                      Change a -> return a
-              in liftIO m' >>= go mnt
+            Just m  -> liftIO (atomically $ fromMaybe w' <$> m) >>= go mnt

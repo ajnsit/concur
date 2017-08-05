@@ -10,6 +10,7 @@ import           Concur.Types                  (Widget, display, effect,
 import           Control.Applicative           (Alternative, empty, (<|>))
 import           Control.Concurrent            (forkIO, threadDelay)
 import           Control.Concurrent.STM        (STM, atomically)
+import           Control.Monad                 (forever)
 import           Control.Monad.IO.Class        (MonadIO (..))
 import           Control.Monad.State           (execStateT, get, lift, put, when)
 import           Control.MonadSTM              (MonadSTM (liftSTM))
@@ -17,13 +18,12 @@ import           Control.MonadSTM              (MonadSTM (liftSTM))
 import           Data.List                     (intercalate)
 import           Data.Maybe                    (mapMaybe)
 import           Data.String                   (fromString)
-import           Data.Void                     (Void, absurd)
+import           Data.Time.Clock               (UTCTime, getCurrentTime)
 
 import qualified Data.JSString                 as JSS
 import           GHCJS.DOM                     (currentDocumentUnchecked)
-import           GHCJS.DOM.EventM              (mouseClientXY, on)
-import           GHCJS.DOM.GlobalEventHandlers (click)
-import           GHCJS.DOM.Types               (JSM)
+import           GHCJS.DOM.EventM              (mouseClientXY, on, uiKeyCode)
+import           GHCJS.DOM.GlobalEventHandlers (click, keyDown)
 import qualified GHCJS.VDOM.Attribute          as A
 import qualified GHCJS.VDOM.Element            as E
 import qualified GHCJS.VDOM.Event              as Ev
@@ -31,33 +31,45 @@ import qualified GHCJS.VDOM.Event              as Ev
 import           Data.MonadTransMap            (MonadTransMap, liftMap)
 
 -- Global mouse click notifications
-documentClickNotifications :: JSM (Notify (Int,Int))
+-- Sets up the click handler once and then return a Widget that listens to it
+documentClickNotifications :: Monoid v => IO (Widget v (Int,Int))
 documentClickNotifications = do
-  n <- liftIO $ atomically newNotify
+  n <- atomically newNotify
   doc <- currentDocumentUnchecked
   _ <- on doc click $ do
     (x, y) <- mouseClientXY
     liftIO $ atomically $ notify n (x,y)
-  return n
+  return $ listenNotify n
+
+-- Global Keyboard notifications
+keyboardNotifications :: Monoid v => IO (Widget v Word)
+keyboardNotifications = do
+  n <- atomically newNotify
+  doc <- currentDocumentUnchecked
+  _ <- on doc keyDown $ do
+    k <- uiKeyCode
+    liftIO $ atomically $ notify n k
+  return $ listenNotify n
 
 -- Returns a widget which waits for a Notification to happen
 listenNotify :: Monoid v => Notify a -> Widget v a
-listenNotify = effect mempty . fetch
+listenNotify = liftSTM . await
+
+-- An example of a completely IO widget
+-- Waits for the specified number of milliseconds
+delay :: Monoid v => Int -> Widget v ()
+delay i = liftIO $ threadDelay (i*1000)
+
+interval :: Monoid v => Int -> IO (Widget v UTCTime)
+interval i = do
+  n <- atomically newNotify
+  -- TODO: Kill Thread at some point. Use Weak TVars for it
+  tid <- forkIO $ forever $ threadDelay (i*1000) >> getCurrentTime >>= atomically . notify n
+  return $ listenNotify n
 
 -- Text display widget
 text :: String -> Widget HTML a
 text s = display [E.text $ JSS.pack s]
-
--- General IO Effects
-io :: Monoid v => IO a -> JSM (Widget v a)
-io m = liftIO $ do
-  n <- atomically newNotify
-  _ <- forkIO $ m >>= atomically . notify n
-  return $ effect mempty $ fetch n
-
--- Delay widget
-delay :: Monoid v => Int -> JSM (Widget v ())
-delay i = io $ threadDelay (i*1000000)
 
 -- A clickable button widget
 button :: String -> Widget HTML ()
@@ -76,21 +88,17 @@ elEvent :: ((a -> IO ()) -> A.Attribute)
         -> Widget HTML (Either a b)
 elEvent evt e attrs w = do
   n <- liftSTM newNotify
-  let wEvt = effect mempty $ fetch n
+  let wEvt = listenNotify n
   let child = el_ e (evt (atomically . notify n): attrs) w
   fmap Left wEvt <|> fmap Right child
 
--- A text label which can be edited by double clicking.
-editableText :: [A.Attribute] -> String -> Widget HTML String
-editableText attrs s = elEvent Ev.dblclick E.span attrs (text s) >> inputEnter attrs s
-
 -- Text input. Returns the contents on keypress enter.
-inputEnter :: [A.Attribute] -> String -> Widget HTML String
-inputEnter attrs def = do
+inputEnter :: [A.Attribute] -> Widget HTML String
+inputEnter attrs = do
   n <- liftSTM newNotify
-  let handleKeypress e = atomically $ when (Ev.key e == "Enter") $ notify n $ JSS.unpack $ Ev.inputValue e
+  let handleKeypress e = when (Ev.key e == "Enter") $ atomically $ notify n $ JSS.unpack $ Ev.inputValue e
   let txt = E.input (Ev.keydown handleKeypress : attrs) ()
-  effect [txt] $ fetch n
+  effect [txt] $ await n
 
 -- Text input. Returns the contents on every change.
 -- This allows setting the value of the textbox, however
@@ -99,7 +107,7 @@ input :: String -> Widget HTML String
 input def = do
   n <- liftSTM newNotify
   let txt = E.input (A.value $ JSS.pack def, Ev.input (atomically . notify n . JSS.unpack . Ev.inputValue)) ()
-  effect [txt] $ fetch n
+  effect [txt] $ await n
 
 -- Text input. Returns the contents on keypress enter.
 -- This one does not allow setting the value of the textbox, however
@@ -109,7 +117,7 @@ mkInput :: STM (Widget HTML String)
 mkInput = do
   n <- newNotify
   let txt = E.input (Ev.input (atomically . notify n . JSS.unpack . Ev.inputValue)) ()
-  return $ effect [txt] $ fetch n
+  return $ effect [txt] $ await n
 
 -- A custom widget. An input field with a button.
 -- When the button is pressed, the value of the input field is returned.
@@ -129,7 +137,7 @@ checkbox :: Bool -> Widget HTML Bool
 checkbox checked = do
   n <- liftSTM newNotify
   let chk = E.input (Ev.click (const $ atomically $ notify n (not checked))) ()
-  effect [chk] $ fetch n
+  effect [chk] $ await n
 
 -- Append multiple widgets together
 -- TODO: Make this more efficient
