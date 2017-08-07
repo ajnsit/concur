@@ -2,14 +2,14 @@
 {-# LANGUAGE RecordWildCards   #-}
 -----------------------------------------------------------------------------
 -- |
--- Module      :  Concur.Subscription.Window
+-- Module      :  Concur.Subscription.Mouse
 -- Copyright   :  (C) 2016-2017 David M. Johnson. Adapted by Anupam Jain.
 -- License     :  BSD3-style (see the file LICENSE)
 -- Maintainer  :  Anupam Jain
 -- Stability   :  experimental
 -- Portability :  non-portable
 ----------------------------------------------------------------------------
-module Concur.Subscription.Window where
+module Concur.Subscription.Mouse (mouseMove) where
 
 import           GHCJS.Foreign.Callback
 import           GHCJS.Marshal
@@ -25,17 +25,15 @@ import           Concur.FFI
 import           Concur.Notify
 import           Concur.Types
 
--- | Captures window coordinates changes as they occur
-windowResize :: Monoid v => IO (Widget v (Int, Int))
-windowResize = do
+-- | Captures mouse coordinates as they occur and writes them to
+-- an event sink
+mouseMove :: Monoid v => IO (Widget v (Int,Int))
+mouseMove = do
   n <- atomically newNotify
   liftIO $ do
-    initSize <- (,) <$> windowInnerHeight <*> windowInnerWidth
-    atomically $ notify n initSize
-    windowAddEventListener "resize" =<< do
-      asyncCallback1 $ \windowEvent -> do
-        target <- getProp "target" (Object windowEvent)
-        Just w <- fromJSVal =<< getProp "innerWidth" (Object target)
-        Just h <- fromJSVal =<< getProp "innerHeight" (Object target)
-        atomically $ notify n (h, w)
+    windowAddEventListener "mousemove" =<< do
+      asyncCallback1 $ \mouseEvent -> do
+        Just x <- fromJSVal =<< getProp "clientX" (Object mouseEvent)
+        Just y <- fromJSVal =<< getProp "clientY" (Object mouseEvent)
+        atomically $ notify n (x,y)
   return $ liftSTM $ await n

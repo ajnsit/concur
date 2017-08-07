@@ -1,35 +1,25 @@
+{-# LANGUAGE CPP                      #-}
 {-# LANGUAGE ForeignFunctionInterface #-}
-{-# LANGUAGE QuasiQuotes #-}
-{-# LANGUAGE CPP #-}
-module Concur.Run where
+{-# LANGUAGE QuasiQuotes              #-}
+module Concur.VDOM.Run where
 
+import           Control.Concurrent.STM (atomically)
 import           Control.Monad          (void)
 import           Control.Monad.Free     (Free (..))
 import           Control.Monad.IO.Class (MonadIO (..))
-import           Control.Concurrent.STM (atomically)
 
 import           Data.Maybe             (fromMaybe)
 
 import           GHCJS.DOM.Types        (JSM)
 import           GHCJS.Foreign.QQ       (js)
-import           GHCJS.VDOM             (VNode, DOMNode, diff, mount, patch)
+import           GHCJS.VDOM             (DOMNode, VNode, diff, mount, patch)
 import qualified GHCJS.VDOM.Element     as E
 import qualified GHCJS.VDOM.Event       as Ev
 
 import           Concur.Types
 
-#if defined(ghcjs_HOST_OS)
-run :: a -> a
-run = id
-#elif defined(MIN_VERSION_jsaddle_wkwebview)
-import Language.Javascript.JSaddle.WKWebView (run)
-#else
-import Language.Javascript.JSaddle.WebKitGTK (run)
-#endif
-
-
 -- HTML structure
-type HTML = [HTMLNode]
+type HTML = [VNode]
 type HTMLNode = VNode
 type HTMLNodeName attrs = attrs -> HTML -> HTMLNode
 
@@ -55,6 +45,4 @@ runWidgetLoading (Widget w) root loading = do
         Free ws -> do
           void $ diff mnt (E.div () $ view ws) >>= patch mnt
           liftIO $ fromMaybe (return ()) $ runIO ws
-          case cont ws of
-            Nothing -> Prelude.error "ERROR: Application suspended indefinitely: This is usually a logic error!"
-            Just m  -> liftIO (atomically $ fromMaybe w' <$> m) >>= go mnt
+          liftIO (atomically $ fromMaybe w' <$> cont ws) >>= go mnt

@@ -1,7 +1,6 @@
-{-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE RecordWildCards     #-}
 {-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE RecordWildCards     #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Concur.Subscription.Keyboard
@@ -20,20 +19,21 @@ module Concur.Subscription.Keyboard
   ) where
 
 import           Data.IORef
-import           Data.Set (Set)
-import qualified Data.Set as S
+import           Data.Set                   (Set)
+import qualified Data.Set                   as S
 import           GHCJS.Foreign.Callback
 import           GHCJS.Marshal
 import           JavaScript.Object
 import           JavaScript.Object.Internal
 
-import Control.Concurrent.STM (STM, atomically, newTVar, readTVar, writeTVar)
-import Control.MonadSTM (MonadSTM (liftSTM))
-import Control.Monad.IO.Class (MonadIO (liftIO))
+import           Control.Concurrent.STM     (STM, atomically, newTVar, readTVar,
+                                             writeTVar)
+import           Control.Monad.IO.Class     (MonadIO (liftIO))
+import           Control.MonadSTM           (MonadSTM (liftSTM))
 
-import Concur.FFI
-import Concur.Types
-import Concur.Notify
+import           Concur.FFI
+import           Concur.Notify
+import           Concur.Types
 
 -- | type for arrow keys currently pressed
 --  37 left arrow  ( x = -1 )
@@ -53,12 +53,12 @@ toArrows set =
       case (S.member 37 set, S.member 39 set) of
         (True, False) -> -1
         (False, True) -> 1
-        (_,_) -> 0
+        (_,_)         -> 0
  ,  arrowY =
       case (S.member 40 set, S.member 38 set) of
         (True, False) -> -1
         (False, True) -> 1
-        (_,_) -> 0
+        (_,_)         -> 0
  }
 
 keyboard :: Monoid v => IO (Widget v (Set Int))

@@ -1,19 +1,23 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections     #-}
-module Concur.Widgets where
+{-# LANGUAGE FlexibleContexts  #-}
+module Concur.VDOM.Widgets where
 
 import           Concur.Notify                 (Notify (..), newNotify)
-import           Concur.Run                    (HTML, HTMLNodeName)
 import           Concur.Types                  (Widget, display, effect,
-                                                wrapView)
+                                                wrapView, MultiAlternative(orr))
+import           Concur.VDOM.Run               (HTML, HTMLNodeName)
 
 import           Control.Applicative           (Alternative, empty, (<|>))
 import           Control.Concurrent            (forkIO, threadDelay)
 import           Control.Concurrent.STM        (STM, atomically)
 import           Control.Monad                 (forever)
 import           Control.Monad.IO.Class        (MonadIO (..))
-import           Control.Monad.State           (execStateT, get, lift, put, when)
+import           Control.Monad.State           (execStateT, get, lift, put,
+                                                when)
 import           Control.MonadSTM              (MonadSTM (liftSTM))
+import           Control.MonadTransMap         (MonadTransMap, liftMap)
+import           Control.MonadShiftMap         (MonadShiftMap, shiftMap)
 
 import           Data.List                     (intercalate)
 import           Data.Maybe                    (mapMaybe)
@@ -28,7 +32,6 @@ import qualified GHCJS.VDOM.Attribute          as A
 import qualified GHCJS.VDOM.Element            as E
 import qualified GHCJS.VDOM.Event              as Ev
 
-import           Data.MonadTransMap            (MonadTransMap, liftMap)
 
 -- Global mouse click notifications
 -- Sets up the click handler once and then return a Widget that listens to it
@@ -139,42 +142,13 @@ checkbox checked = do
   let chk = E.input (Ev.click (const $ atomically $ notify n (not checked))) ()
   effect [chk] $ await n
 
--- Append multiple widgets together
--- TODO: Make this more efficient
-orr :: Alternative m => [m a] -> m a
-orr = foldr (<|>) empty
-
 -- Generic Element wrapper (single child widget)
-el_ :: HTMLNodeName [A.Attribute] -> [A.Attribute] -> Widget HTML a -> Widget HTML a
-el_ e attrs = wrapView (e attrs)
+el_ :: MonadShiftMap (Widget HTML) m => HTMLNodeName [A.Attribute] -> [A.Attribute] -> m a -> m a
+el_ e attrs = shiftMap (wrapView (e attrs))
 
 -- Generic Element wrapper
-el :: HTMLNodeName [A.Attribute] -> [A.Attribute] -> [Widget HTML a] -> Widget HTML a
-el e attrs = wrapView (e attrs) . orr
-
--- The transformer version of el_
-elT_ :: (MonadTransMap t) => HTMLNodeName [A.Attribute] -> [A.Attribute] -> t (Widget HTML) a -> t (Widget HTML) a
-elT_ e attrs = liftMap (wrapView (e attrs))
-
--- The transformer version of el
-elT :: (Alternative (t (Widget HTML)), MonadTransMap t) => HTMLNodeName [A.Attribute] -> [A.Attribute] -> [t (Widget HTML) a] -> t (Widget HTML) a
-elT e attrs = liftMap (wrapView (e attrs)) . orr
-
--- Package a widget inside a div
-wrapDiv :: A.Attributes attrs => attrs -> Widget HTML a -> Widget HTML a
-wrapDiv attrs = wrapView (E.div attrs)
-
--- The transformer version of wrapDiv
-wrapDivT :: (MonadTransMap t, A.Attributes attrs) => attrs -> t (Widget HTML) a -> t (Widget HTML) a
-wrapDivT attrs = liftMap (wrapDiv attrs)
-
--- Like wrapDiv but takes a list of widgets to match the usual Elm syntax
-elDiv :: A.Attributes attrs => attrs -> [Widget HTML a] -> Widget HTML a
-elDiv attrs = wrapDiv attrs . orr
-
--- The transformer version of elDiv
-elDivT :: (MonadTransMap t, Alternative (t (Widget HTML)), A.Attributes attrs) => attrs -> [t (Widget HTML) a] -> t (Widget HTML) a
-elDivT attrs = wrapDivT attrs . orr
+el :: (MonadShiftMap (Widget HTML) m, MultiAlternative m) => HTMLNodeName [A.Attribute] -> [A.Attribute] -> [m a] -> m a
+el e attrs = shiftMap (wrapView (e attrs)) . orr
 
 -- Utility to easily create class attributes
 classList :: [(String, Bool)] -> A.Attribute

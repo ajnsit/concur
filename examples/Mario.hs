@@ -1,37 +1,37 @@
+{-# LANGUAGE MultiWayIf        #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE MultiWayIf        #-}
-{-# LANGUAGE BangPatterns      #-}
 module Main where
 
-import           Control.Applicative    ((<|>))
-import           Control.Monad          (forever, void)
-import           Control.Monad.IO.Class (liftIO)
-import           Control.Monad.State    (StateT, execStateT, get, lift, modify)
+import           Control.Applicative          ((<|>))
+import           Control.Monad                (forever, void)
+import           Control.Monad.IO.Class       (liftIO)
+import           Control.Monad.State          (StateT, execStateT, get, lift,
+                                               modify)
 
+import qualified Data.JSString                as JSS
 import           Data.Time.Clock
-import qualified Data.JSString                 as JSS
 
-import qualified GHCJS.VDOM.Attribute          as A
-import qualified GHCJS.VDOM.Element            as E
+import qualified GHCJS.VDOM.Attribute         as A
+import qualified GHCJS.VDOM.Element           as E
 
-import           Concur                 (HTML, Widget, button, delay,
-                                         documentClickNotifications, initConcur,
-                                         runWidgetInBody, text, wrapDiv, keyboardNotifications,
-                                         interval, elT, el)
+import           Concur                       (HTML, Widget, el, initConcur,
+                                               interval, keyboardNotifications,
+                                               runWidgetInBody)
 
-import Concur.Subscription.Window
-import Concur.Subscription.Keyboard
+import           Concur.Subscription.Keyboard (Arrows (Arrows, arrowX, arrowY),
+                                               arrows)
+import           Concur.Subscription.Window   (windowResize)
 
 data Mario = Mario
-  { x :: !Double
-  , y :: !Double
-  , vx :: !Double
-  , vy :: !Double
-  , time :: !UTCTime
-  , delta :: !Double
-  , arrow :: !Arrows
-  , dir :: !Dir
+  { x      :: !Double
+  , y      :: !Double
+  , vx     :: !Double
+  , vy     :: !Double
+  , time   :: !UTCTime
+  , delta  :: !Double
+  , arrow  :: !Arrows
+  , dir    :: !Dir
   , window :: !(Int,Int)
   }
 data Dir = L | R deriving (Show, Eq)

@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveFunctor              #-}
+{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TupleSections              #-}
 module Concur.Types
@@ -15,16 +16,18 @@ module Concur.Types
   , cont
   , Effect
   , effect
+  , MultiAlternative(..)
   ) where
 
-import           Concur.Notify          (newNotify, notify, await)
-import           Control.Applicative    (Alternative, empty, (<|>))
-import           Control.Concurrent     (forkIO)
-import           Control.Concurrent.STM (STM, atomically)
-import           Control.Monad          (MonadPlus (..), void)
-import           Control.Monad.Free     (Free (..), hoistFree, liftF)
-import           Control.Monad.IO.Class (MonadIO, liftIO)
-import           Control.MonadSTM       (MonadSTM (..))
+import           Concur.Notify            (await, newNotify, notify)
+import           Control.Applicative      (Alternative, empty, (<|>))
+import           Control.Concurrent       (forkIO)
+import           Control.Concurrent.STM   (STM, atomically, retry)
+import           Control.Monad            (MonadPlus (..), void)
+import           Control.Monad.Free       (Free (..), hoistFree, liftF)
+import           Control.Monad.IO.Class   (MonadIO, liftIO)
+import           Control.MonadSTM         (MonadSTM (..))
+import           Control.MultiAlternative (MultiAlternative, orr)
 
 newtype Widget v a = Widget { suspend :: Free (Suspend v) a }
   deriving (Functor, Applicative, Monad)
@@ -32,8 +35,7 @@ newtype Widget v a = Widget { suspend :: Free (Suspend v) a }
 data Suspend v a = Suspend { view :: v, runIO :: Maybe (IO ()), cont :: Effect a }
   deriving Functor
 
--- Nothing means no effects
-type Effect a = Maybe (STM (Maybe a))
+type Effect a = STM (Maybe a)
 
 continue :: Suspend v a -> Widget v a
 continue = Widget . liftF
@@ -42,7 +44,7 @@ widget :: v -> Effect a -> Widget v a
 widget v r = continue $ Suspend v Nothing r
 
 display :: v -> Widget v a
-display v = widget v Nothing
+display v = widget v retry
 
 -- Never returns, use as an identity for <|>
 never :: Monoid v => Widget v a
@@ -60,41 +62,40 @@ wrapView f = mapView (pure . f)
 
 -- A pure effect
 effect :: v -> STM a -> Widget v a
-effect v m = widget v $ Just $ Just <$> m
+effect v m = widget v $ Just <$> m
 
 instance Monoid v => MonadSTM (Widget v) where
-  liftSTM m = widget mempty $ Just $ Just <$> m
+  liftSTM m = widget mempty $ Just <$> m
 
 instance Monoid v => MonadIO (Widget v) where
   liftIO io = do
     n <- liftSTM newNotify
-    continue $ Suspend mempty (Just $ void $ forkIO $ io >>= atomically . notify n) $ Just $ Just <$> (await n)
+    continue $ Suspend mempty (Just $ void $ forkIO $ io >>= atomically . notify n) $ Just <$> await n
 
 -- IMPORTANT NOTE: This Alternative instance is NOT the same one as that for Free.
 -- That one simply uses Alternative for Suspend. But that one isn't sufficient for us.
+-- Verify laws:
+--         Right distributivity (of <*>):  (f <|> g) <*> a = (f <*> a) <|> (g <*> a)
+--         Right absorption (for <*>):  empty <*> a = empty
+--         Left distributivity (of fmap):  f <$> (a <|> b) = (f <$> a) <|> (f <$> b)
+--  OK     Left absorption (for fmap):  f <$> empty = empty
 instance Monoid v => Alternative (Widget v) where
   empty = never
-  Widget f <|> Widget g = Widget $ comb f g
+  f <|> g = orr [f,g]
+
+instance Monoid v => MultiAlternative (Widget v) where
+  orr = Widget . comb . map suspend
     where
-      comb :: Monoid v => Free (Suspend v) a -> Free (Suspend v) a -> Free (Suspend v) a
-      comb (Pure fa) _         = pure fa
-      comb _         (Pure ga) = pure ga
-      comb fss@(Free fs) gss@(Free gs) = Free $ Suspend (view fs `mappend` view gs) (mrunIO (runIO fs) (runIO gs)) $
-        case (cont fs, cont gs) of
-          (Nothing, Nothing) -> Nothing
-          (Nothing, Just mg) -> Just $ fmap (comb fss) <$> mg
-          (Just mf, Nothing) -> Just $ fmap (`comb` gss) <$> mf
-          (Just mf, Just mg) -> Just $ do
-            ev <- fmap Left mf <|> fmap Right mg
-            return $ case ev of
-              Left (Just m)  -> Just $ comb m gss
-              Right (Just m) -> Just $ comb fss m
-              _              -> Nothing
-      mrunIO :: Maybe (IO ()) -> Maybe (IO ()) -> Maybe (IO ())
-      mrunIO Nothing Nothing = Nothing
-      mrunIO Nothing m = m
-      mrunIO m Nothing = m
-      mrunIO (Just m) (Just n) = Just $ m >> n
+      peelAllFree []           = Right []
+      peelAllFree (Pure a : _) = Left a
+      peelAllFree (Free s: fs) = fmap (s:) $ peelAllFree fs
+      comb wfs = case peelAllFree wfs of
+        Left a -> pure a
+        Right fs -> Free $ Suspend (mconcat $ fmap view fs) (mconcat $ fmap runIO fs) (merge $ map cont fs)
+        where
+          merge ws = do
+            (i, me) <- foldl (\prev (i,w) -> prev <|> fmap (i,) w) retry $ zip [0..] ws
+            return $ fmap (\e -> comb $ take i wfs ++ [e] ++ drop (i+1) wfs) me
 
 -- The default instance derives from Alternative
 instance Monoid v => MonadPlus (Widget v)

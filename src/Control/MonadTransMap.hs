@@ -1,8 +1,8 @@
-{-# LANGUAGE RankNTypes #-}
-module Data.MonadTransMap where
+{-# LANGUAGE RankNTypes            #-}
+module Control.MonadTransMap where
 
-import Control.Monad.State (StateT, mapStateT)
-import Control.Monad.Trans.Identity (IdentityT, mapIdentityT)
+import           Control.Monad.State          (StateT, mapStateT)
+import           Control.Monad.Trans.Identity (IdentityT, mapIdentityT)
 
 class MonadTransMap t where
   liftMap :: (forall x. m x -> m x) -> t m a -> t m a

@@ -15,7 +15,7 @@ import qualified GHCJS.VDOM.Element   as E
 import qualified GHCJS.VDOM.Event     as Ev
 
 import           Concur               (HTML, Widget, classList, clickEl, el,
-                                       elEvent, elT, elT_, el_, initConcur,
+                                       elEvent, el_, initConcur,
                                        inputEnter, never, orr, runWidgetInBody,
                                        text)
 
@@ -61,8 +61,8 @@ entriesLeft elist = length (entriesList elist) - entriesCompleted elist
 type EntriesWidget a = StateT EntriesList (Widget HTML) a
 
 widgetTodos :: EntriesWidget a
-widgetTodos = forever $ elT E.div [ A.class_ "todomvc-wrapper" ]
-  [ elT E.section [A.class_ "todoapp"] [widgetInput, widgetEntries, widgetControls]
+widgetTodos = forever $ el E.div [ A.class_ "todomvc-wrapper" ]
+  [ el E.section [A.class_ "todoapp"] [widgetInput, widgetEntries, widgetControls]
   , lift $ el E.footer [ A.class_ "info" ]
         [ el E.p [] [text "Double-click to edit a todo"]
         , el E.p []
@@ -77,9 +77,9 @@ widgetTodos = forever $ elT E.div [ A.class_ "todomvc-wrapper" ]
   ]
 
 widgetInput :: EntriesWidget ()
-widgetInput = elT E.header
+widgetInput = el E.header
   [ A.class_ "header" ]
-  [ elT E.h1 [] [lift $ text "todos"]
+  [ el E.h1 [] [lift $ text "todos"]
   , do
       elist <- get
       s <- lift $ inputEnter [A.class_ "new-todo", A.placeholder "What needs to be done?", A.autofocus "autofocus", A.name "newTodo", A.value ""]
@@ -89,9 +89,9 @@ widgetInput = elT E.header
 widgetEntries :: EntriesWidget ()
 widgetEntries = do
   elist <- get
-  elT E.section [ classList [("main", True), ("hidden", null $ entriesList elist)] ]
+  el E.section [ classList [("main", True), ("hidden", null $ entriesList elist)] ]
     [ lift (allCompletedToggle (allCompleted elist)) >>= put . flip markAllComplete elist
-    , elT_ E.ul [ A.class_ "todo-list" ] $ elistToEntriesListWidget elist
+    , el_ E.ul [ A.class_ "todo-list" ] $ elistToEntriesListWidget elist
     ]
   where
     addChecked v l = if v then (A.checked "checked" : l) else l
@@ -135,21 +135,21 @@ widgetEntry todo = go False
 widgetControls :: EntriesWidget ()
 widgetControls = do
   elist <- get
-  elT E.footer
+  el E.footer
       [ classList [("footer", True), ("hidden", null $ entriesList elist)] ]
       [ widgetControlsCount , widgetControlsFilters , widgetControlsClear ]
 
 widgetControlsCount :: EntriesWidget a
 widgetControlsCount = do
   elist <- get
-  elT E.span
+  el E.span
       [ A.class_ "todo-count" ]
-      [ elT E.strong [] [ lift $ text (fromString $ show $ entriesLeft elist) ]
+      [ el E.strong [] [ lift $ text (fromString $ show $ entriesLeft elist) ]
       , lift $ text $ (if entriesLeft elist == 1 then " item" else " items") ++ " left"
       ]
 
 widgetControlsFilters :: EntriesWidget ()
-widgetControlsFilters = elT_ E.ul [ A.class_ "filters" ] $ do
+widgetControlsFilters = el_ E.ul [ A.class_ "filters" ] $ do
   elist <- get
   newVisibility <- lift $ visibilityWidget $ entriesVisibility elist
   put $ elist { entriesVisibility = newVisibility }

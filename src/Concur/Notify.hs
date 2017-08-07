@@ -1,9 +1,10 @@
 module Concur.Notify
   ( Notify (..)
   , newNotify
+  , newNotifyIO
   ) where
 
-import           Control.Concurrent.STM (STM, TVar, newTVar, readTVar, writeTVar, retry)
+import           Control.Concurrent.STM (STM, TVar, newTVarIO, newTVar, readTVar, writeTVar, retry)
 import           Control.Monad          (void)
 
 -- TODO: Use Weak TVar pointers as appropriate
@@ -14,12 +15,10 @@ data Notify a = Notify
   }
 
 newNotify :: STM (Notify a)
-newNotify = do
-  v <- newTVar Nothing
-  return $ Notify
-   (tryTakeTVar v)
-   (takeTVar v)
-   (void . writeTVar v . Just)
+newNotify = notifyFromTVar <$> newTVar Nothing
+
+newNotifyIO :: IO (Notify a)
+newNotifyIO = notifyFromTVar <$> newTVarIO Nothing
 
 takeTVar :: TVar (Maybe a) -> STM a
 takeTVar t = do
@@ -34,3 +33,9 @@ tryTakeTVar t = do
   case m of
     Nothing -> return Nothing
     Just a  -> do writeTVar t Nothing; return (Just a)
+
+notifyFromTVar :: TVar (Maybe a) -> Notify a
+notifyFromTVar v = Notify
+   (tryTakeTVar v)
+   (takeTVar v)
+   (void . writeTVar v . Just)
