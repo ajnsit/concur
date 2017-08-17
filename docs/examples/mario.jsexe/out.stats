@@ -1,16 +1,16 @@
 code size summary per package:
 
-base:                    427164
-concur-0.1.0.0-LTn3JHKtLfg89Zi9npyAR1:46846
+base:                    429930
+concur-0.1.0.0-E4x2xftu8HRDsZNX9fKhh:47617
 containers-0.5.7.1-9AY76Rzb1QLJmP8p4wSZRz:29151
 deepseq-1.4.2.0-47yvsc92PQF1rYmebWoAXZ:878
 free-4.12.4-4DU15KXPdzZ2FhNPNvDKhk:2488
 ghc-prim:                9540
 ghcjs-base-0.2.0.0-GiGsdYOoO5CISyJ2m7ax9F:4116
 ghcjs-prim-0.1.0.0-IFhsWclGfLr1HfhUvIVylA:11379
-ghcjs-vdom-0.2.0.0-5TH3hPDqDyVDx6nAIZe9ys:17426
+ghcjs-vdom-0.2.0.0-5TH3hPDqDyVDx6nAIZe9ys:17416
 integer-gmp:             84063
-main:                    51437
+main:                    51238
 time-1.6.0.1-Lja9T8bqIudL0xdsRMOCyg:8426
 
 
@@ -29,9 +29,9 @@ base
     Foreign.Marshal.Array:              1987
     Foreign.Storable:                   9380
     GHC.Arr:                            3664
-    GHC.Base:                           7587
+    GHC.Base:                           8967
     GHC.Conc.Sync:                      8431
-    GHC.Enum:                           8609
+    GHC.Enum:                           9995
     GHC.Err:                            259
     GHC.Exception:                      16400
     GHC.Fingerprint:                    1459
@@ -70,13 +70,13 @@ base
     GHC.Word:                           923
     System.Posix.Internals:             15328
 
-concur-0.1.0.0-LTn3JHKtLfg89Zi9npyAR1
-    Concur.Notify:                      1458
-    Concur.Run:                         6841
-    Concur.Subscription.Keyboard:       17170
-    Concur.Subscription.Window:         4949
-    Concur.Types:                       12857
-    Concur.Widgets:                     3571
+concur-0.1.0.0-E4x2xftu8HRDsZNX9fKhh
+    Concur.Notify:                      1453
+    Concur.Subscription.Keyboard:       16778
+    Concur.Subscription.Window:         4894
+    Concur.Types:                       14549
+    Concur.VDOM.Run:                    6981
+    Concur.VDOM.Widgets:                2962
 
 containers-0.5.7.1-9AY76Rzb1QLJmP8p4wSZRz
     Data.Set.Base:                      29151
@@ -104,7 +104,7 @@ ghcjs-prim-0.1.0.0-IFhsWclGfLr1HfhUvIVylA
     GHCJS.Prim.Internal.Build:          727
 
 ghcjs-vdom-0.2.0.0-5TH3hPDqDyVDx6nAIZe9ys
-    GHCJS.VDOM.Event:                   10388
+    GHCJS.VDOM.Event:                   10378
     GHCJS.VDOM.Internal.Thunk:          5862
     GHCJS.VDOM.Internal.Types:          1176
 
@@ -112,7 +112,7 @@ integer-gmp
     GHC.Integer.Type:                   84063
 
 main
-    Main:                               51437
+    Main:                               51238
 
 time-1.6.0.1-Lja9T8bqIudL0xdsRMOCyg
     Data.Time.Clock.CTimespec:          1550
@@ -121,5 +121,5 @@ time-1.6.0.1-Lja9T8bqIudL0xdsRMOCyg
 
 
 
-packed metadata: 141951
+packed metadata: 143327
 

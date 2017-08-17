@@ -12,6 +12,7 @@ There are lots of options for building web UIs. I have built large UIs with Plai
 
 ## The solution
 This library was originally conceived as a way to improve Elm by adding -
+
 1. Easy widget composition. If you have a `counter` widget, then adding two of them in the same page should be something as simple as `counter <|> counter`
 2. Remove the focus on State modification. Make rendering a `Monad` so that it's possible to use `StateT` transformer to get easy state modification back.
 3. Use *inversion of control* to make everything seem synchronous and simplify code. Waiting for a click event should be as simple as `click >>= doSomething` with no callbacks in sight.
@@ -20,9 +21,8 @@ This library was originally conceived as a way to improve Elm by adding -
 
 ## Examples
 
-NOTE: You can see the examples in action at - https://ajnsit.github.io/concur/
-
-1. [Click Counting Example](examples/ClickCounter.hs) - [Demo](https://ajnsit.github.io/concur/examples/clickCounter.jsexe/index.html) - Count total number of clicks on the page, with a button that increments the click count by 10, and also autoincrement clicks every second.
-2. [TodoMVC Example](examples/Todos.hs) - [Demo](https://ajnsit.github.io/concur/examples/todos.jsexe/index.html) - The canonical TodoMVC example, with views modeled after the one in Elm.
-3. [Mario Example](examples/Mario.hs) - [Demo](https://ajnsit.github.io/concur/examples/mario.jsexe/index.html) - Port of the Mario example from Elm.
-
+1. [Click Counting Example](https://github.com/ajnsit/concur/blob/master/examples/ClickCounter.hs) - [Demo](https://ajnsit.github.io/concur/examples/clickCounter.jsexe/index.html) - Count total number of clicks on the page, with a button that increments the click count by 10, and also autoincrement clicks every second.
+2. [TodoMVC Example](https://github.com/ajnsit/concur/blob/master/examples/Todos.hs) - [Demo](https://ajnsit.github.io/concur/examples/todos.jsexe/index.html) - The canonical TodoMVC example, with views modeled after the one in Elm.
+3. [Mario Example](https://github.com/ajnsit/concur/blob/master/examples/Mario.hs) - [Demo](https://ajnsit.github.io/concur/examples/mario.jsexe/index.html) - Port of the Mario example from Elm.
+4. [High/Low Game Example](https://github.com/ajnsit/concur/blob/master/examples/HiLo.hs) - [Demo](https://ajnsit.github.io/concur/examples/hilo.jsexe/index.html) - An extremely simple number guessing game in 15 lines of code.
+5. [Kirby Super Star Ultra Splits Timer GUI Challange](https://github.com/ajnsit/concur/blob/master/examples/KirbySuperStarUltra.hs) - [Demo](https://ajnsit.github.io/concur/examples/kssu.jsexe/index.html) - Concur implementation of the [KSSU Splits Timer GUI Challenge](https://gist.github.com/lexi-lambda/701f1f1282401059f13a4220e8178ba4). Shows a moderately complex UI that's not a todolist!

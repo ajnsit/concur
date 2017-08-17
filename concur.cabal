@@ -56,6 +56,8 @@ library
                      , time
                      , containers
                      , network-uri
+                     , text
+                     , unordered-containers
 
   if !impl(ghcjs)
     hs-source-dirs:    ghc-src
@@ -71,6 +73,35 @@ library
 --------------
 -- EXAMPLES --
 --------------
+
+executable kssu
+  ghc-options:         -threaded -Wall -ferror-spans
+  hs-source-dirs:      examples
+  main-is:             KirbySuperStarUltra.hs
+  default-language:    Haskell2010
+  build-depends:       base >= 4.7 && < 5
+                     , concur
+                     , ghcjs-dom
+                     , mtl
+                     , containers
+
+  -- Needs some sort of a webview
+  -- if !flag(webkitgtk) || impl(ghcjs) || os(ios)
+  --   buildable: False
+
+  if !impl(ghcjs)
+    -- Choose suitable runner
+    if os(osx) || os(ios)
+      build-depends:   jsaddle-wkwebview
+    else
+      if flag(webkit2gtk)
+        build-depends: jsaddle-webkit2gtk
+      else
+        build-depends: jsaddle-webkitgtk
+  else
+    build-depends:     ghcjs-vdom
+                     , ghcjs-ffiqq
+                     , ghcjs-base
 
 executable hilo
   ghc-options:         -threaded -Wall -ferror-spans

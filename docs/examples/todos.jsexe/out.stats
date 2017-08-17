@@ -1,15 +1,16 @@
 code size summary per package:
 
-base:                    312292
-concur-0.1.0.0-LTn3JHKtLfg89Zi9npyAR1:38252
+base:                    314934
+concur-0.1.0.0-E4x2xftu8HRDsZNX9fKhh:47632
 deepseq-1.4.2.0-47yvsc92PQF1rYmebWoAXZ:878
-free-4.12.4-4DU15KXPdzZ2FhNPNvDKhk:2488
+free-4.12.4-4DU15KXPdzZ2FhNPNvDKhk:11561
 ghc-prim:                6528
 ghcjs-base-0.2.0.0-GiGsdYOoO5CISyJ2m7ax9F:4691
 ghcjs-prim-0.1.0.0-IFhsWclGfLr1HfhUvIVylA:11379
-ghcjs-vdom-0.2.0.0-5TH3hPDqDyVDx6nAIZe9ys:19148
+ghcjs-vdom-0.2.0.0-5TH3hPDqDyVDx6nAIZe9ys:19142
 integer-gmp:             2311
-main:                    117477
+main:                    131288
+transformers-0.5.2.0-Lvs3wlJMkpyLRFNHJ8pmeB:6935
 
 
 code size per module:
@@ -27,10 +28,10 @@ base
     Foreign.Marshal.Alloc:              301
     Foreign.Marshal.Array:              1987
     Foreign.Storable:                   9380
-    GHC.Base:                           7419
+    GHC.Base:                           10331
     GHC.Conc.Sync:                      4428
     GHC.Enum:                           1596
-    GHC.Err:                            259
+    GHC.Err:                            442
     GHC.Exception:                      12448
     GHC.Fingerprint:                    1459
     GHC.Fingerprint.Type:               724
@@ -59,23 +60,24 @@ base
     GHC.STRef:                          180
     GHC.Show:                           4681
     GHC.Stack.CCS:                      3971
-    GHC.Stack.Types:                    1491
+    GHC.Stack.Types:                    1014
     GHC.Storable:                       1070
     GHC.TopHandler:                     12934
     GHC.Word:                           923
-    System.Posix.Internals:             15320
+    System.Posix.Internals:             15344
 
-concur-0.1.0.0-LTn3JHKtLfg89Zi9npyAR1
-    Concur.Notify:                      1458
-    Concur.Run:                         6841
-    Concur.Types:                       10442
-    Concur.Widgets:                     19511
+concur-0.1.0.0-E4x2xftu8HRDsZNX9fKhh
+    Concur.Notify:                      321
+    Concur.Types:                       19386
+    Concur.VDOM.Run:                    6981
+    Concur.VDOM.Widgets:                19966
+    Control.MultiAlternative:           978
 
 deepseq-1.4.2.0-47yvsc92PQF1rYmebWoAXZ
     Control.DeepSeq:                    878
 
 free-4.12.4-4DU15KXPdzZ2FhNPNvDKhk
-    Control.Monad.Free:                 2488
+    Control.Monad.Free:                 11561
 
 ghc-prim
     GHC.CString:                        1862
@@ -94,7 +96,7 @@ ghcjs-prim-0.1.0.0-IFhsWclGfLr1HfhUvIVylA
     GHCJS.Prim.Internal.Build:          727
 
 ghcjs-vdom-0.2.0.0-5TH3hPDqDyVDx6nAIZe9ys
-    GHCJS.VDOM.Event:                   12110
+    GHCJS.VDOM.Event:                   12104
     GHCJS.VDOM.Internal.Thunk:          5862
     GHCJS.VDOM.Internal.Types:          1176
 
@@ -102,9 +104,12 @@ integer-gmp
     GHC.Integer.Type:                   2311
 
 main
-    Main:                               117477
+    Main:                               131288
+
+transformers-0.5.2.0-Lvs3wlJMkpyLRFNHJ8pmeB
+    Control.Monad.Trans.State.Lazy:     6935
 
 
 
-packed metadata: 116498
+packed metadata: 130869
 

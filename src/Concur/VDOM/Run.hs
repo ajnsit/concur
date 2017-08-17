@@ -21,7 +21,8 @@ import           Concur.Types
 -- HTML structure
 type HTML = [VNode]
 type HTMLNode = VNode
-type HTMLNodeName attrs = attrs -> HTML -> HTMLNode
+type HTMLWrapper = HTML -> HTMLNode
+type HTMLNodeName attrs = attrs -> HTMLWrapper
 
 initConcur :: JSM ()
 initConcur = Ev.initEventDelegation Ev.defaultEvents
