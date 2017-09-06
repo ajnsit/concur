@@ -32,9 +32,9 @@ This library was originally conceived as a way to improve Elm by adding -
 
 ### Examples (These are currently only the vdom backend examples)
 
-1. [Click Counting Example](https://github.com/ajnsit/concur/blob/master/examples/ClickCounter.hs) - [Demo](https://ajnsit.github.io/concur/examples/clickCounter.jsexe/index.html) - Count total number of clicks on the page, with a button that increments the click count by 10, and also autoincrement clicks every second.
-2. [TodoMVC Example](https://github.com/ajnsit/concur/blob/master/examples/Todos.hs) - [Demo](https://ajnsit.github.io/concur/examples/todos.jsexe/index.html) - The canonical TodoMVC example, with views modeled after the one in Elm.
-3. [Mario Example](https://github.com/ajnsit/concur/blob/master/examples/Mario.hs) - [Demo](https://ajnsit.github.io/concur/examples/mario.jsexe/index.html) - Port of the Mario example from Elm.
-4. [High/Low Game Example](https://github.com/ajnsit/concur/blob/master/examples/HiLo.hs) - [Demo](https://ajnsit.github.io/concur/examples/hilo.jsexe/index.html) - An extremely simple number guessing game in 15 lines of code.
-5. [Kirby Super Star Ultra Splits Timer GUI Challange](https://github.com/ajnsit/concur/blob/master/examples/KirbySuperStarUltra.hs) - [Demo](https://ajnsit.github.io/concur/examples/kssu.jsexe/index.html) - Concur implementation of the [KSSU Splits Timer GUI Challenge](https://gist.github.com/lexi-lambda/701f1f1282401059f13a4220e8178ba4). Shows a moderately complex UI that's not a todolist!
+1. [Click Counting Example](https://github.com/ajnsit/concur/blob/master/concur-vdom/examples/ClickCounter.hs) - [Demo](https://ajnsit.github.io/concur/examples/clickCounter.jsexe/index.html) - Count total number of clicks on the page, with a button that increments the click count by 10, and also autoincrement clicks every second.
+2. [TodoMVC Example](https://github.com/ajnsit/concur/blob/master/concur-vdom/examples/Todos.hs) - [Demo](https://ajnsit.github.io/concur/examples/todos.jsexe/index.html) - The canonical TodoMVC example, with views modeled after the one in Elm.
+3. [Mario Example](https://github.com/ajnsit/concur/blob/master/concur-vdom/examples/Mario.hs) - [Demo](https://ajnsit.github.io/concur/examples/mario.jsexe/index.html) - Port of the Mario example from Elm.
+4. [High/Low Game Example](https://github.com/ajnsit/concur/blob/master/concur-vdom/examples/HiLo.hs) - [Demo](https://ajnsit.github.io/concur/examples/hilo.jsexe/index.html) - An extremely simple number guessing game in 15 lines of code.
+5. [Kirby Super Star Ultra Splits Timer GUI Challange](https://github.com/ajnsit/concur/blob/master/concur-vdom/examples/KirbySuperStarUltra.hs) - [Demo](https://ajnsit.github.io/concur/examples/kssu.jsexe/index.html) - Concur implementation of the [KSSU Splits Timer GUI Challenge](https://gist.github.com/lexi-lambda/701f1f1282401059f13a4220e8178ba4). Shows a moderately complex UI that's not a todolist!
 
