@@ -1,0 +1,16 @@
+{
+  "name": "concur-react",
+  "version": "0.1.0",
+  "description": "React bindings to the Concur UI lib",
+  "main": "index.js",
+  "scripts": {
+    "test": "exit 0",
+    "build": "browserify jsbits/index.js | uglifyjs > jsbits/lib.js"
+  },
+  "author": "Anupam Jain",
+  "license": "BSD3",
+  "dependencies": {
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1"
+  }
+}
