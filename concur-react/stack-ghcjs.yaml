@@ -18,5 +18,3 @@ setup-info:
            url: http://ghcjs.tolysz.org/ghc-8.0-2017-02-05-lts-7.19-9007019.tar.gz
            sha1: d2cfc25f9cda32a25a87d9af68891b2186ee52f9
 
-nix:
-  enable: false
