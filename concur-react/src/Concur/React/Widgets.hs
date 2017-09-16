@@ -30,7 +30,7 @@ text txt = display [vtext $ JSS.pack txt]
 
 -- Generic Element wrapper (single child widget)
 el_ :: (MonadShiftMap (Widget HTML) m) => JSString -> [VAttr] -> m a -> m a
-el_ e attrs = shiftMap (wrapView (vnode e attrs))
+el_ e attrs = shiftMap (wrapView (vnode (unsafeCoerce e) attrs))
 
 -- Generic Element wrapper
 el :: (MonadShiftMap (Widget HTML) m, MultiAlternative m) => JSString -> [VAttr] -> [m a] -> m a
@@ -38,7 +38,7 @@ el e attrs = el_ e attrs . orr
 
 -- Create a dom leaf node
 elLeaf :: JSString -> [VAttr] -> Widget HTML a
-elLeaf e attrs = display [vleaf e attrs]
+elLeaf e attrs = display [vleaf (unsafeCoerce e) attrs]
 
 -- Helper
 mkEventHandlerAttr :: JSString -> STM (VAttr, STM JSVal)

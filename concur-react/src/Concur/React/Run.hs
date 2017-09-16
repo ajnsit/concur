@@ -9,6 +9,8 @@ import           Concur.React.Attributes
 import           Data.Maybe             (fromMaybe)
 import           Control.Monad.IO.Class (MonadIO (..))
 import           Control.Concurrent.STM (atomically)
+import           GHCJS.Types            (JSString)
+import           Unsafe.Coerce          (unsafeCoerce)
 
 runWidgetInBody :: Widget HTML a -> IO a
 runWidgetInBody w = do
@@ -25,7 +27,7 @@ runWidget (Widget w) root = go w
         Free ws -> do
           -- html <- bakeHTML $ view ws
           -- attrs <- bakeAttrs []
-          html <- mkReactParent "div" <$> (bakeAttrs []) <*> (bakeHTML (view ws)) -- $ mkReactParent "div" (mkAttributes ()) $
+          html <- mkReactParent (unsafeCoerce ("div" :: JSString)) <$> (bakeAttrs []) <*> (bakeHTML (view ws)) -- $ mkReactParent "div" (mkAttributes ()) $
           renderReactDOM root html
           liftIO $ fromMaybe (return ()) $ runIO ws
           liftIO (atomically $ fromMaybe w' <$> cont ws) >>= go

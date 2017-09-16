@@ -9,8 +9,8 @@ import Unsafe.Coerce (unsafeCoerce)
 type HTML = [VDOM]
 
 data VDOM
-  = VNode JSString [VAttr] [VDOM]
-  | VLeaf JSString [VAttr]
+  = VNode JSVal [VAttr] [VDOM]
+  | VLeaf JSVal [VAttr]
   | VText JSString
 
 data VAttr = VAttr
@@ -27,10 +27,10 @@ vevt name handler = VAttr name (Right handler)
 vattr :: JSString -> JSString -> VAttr
 vattr name val = VAttr name (Left $ unsafeCoerce val)
 
-vnode :: JSString -> [VAttr] -> [VDOM] -> VDOM
+vnode :: JSVal -> [VAttr] -> [VDOM] -> VDOM
 vnode = VNode
 
-vleaf :: JSString -> [VAttr] -> VDOM
+vleaf :: JSVal -> [VAttr] -> VDOM
 vleaf = VLeaf
 
 vtext :: JSString -> VDOM

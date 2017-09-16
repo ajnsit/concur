@@ -58,11 +58,11 @@ foreign import javascript unsafe "h$concur.ReactDOM.render($2, $1)"
 
 -- | PURE: Construct a react dom node with children.
 foreign import javascript unsafe "h$concur.React.createElement($1, $2, $3)"
-  mkReactParent :: JSString -> ReactAttributes -> HTML' -> ReactNode
+  mkReactParent :: JSVal -> ReactAttributes -> HTML' -> ReactNode
 
 -- | PURE: Construct a react dom node without children.
 foreign import javascript unsafe "h$concur.React.createElement($1, $2)"
-  mkReactLeaf :: JSString -> ReactAttributes -> ReactNode
+  mkReactLeaf :: JSVal -> ReactAttributes -> ReactNode
 
 -- | PURE: Construct a text dom node.
 foreign import javascript unsafe "$r = $1;"
