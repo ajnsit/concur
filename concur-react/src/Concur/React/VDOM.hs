@@ -27,6 +27,9 @@ vevt name handler = VAttr name (Right handler)
 vattr :: JSString -> JSString -> VAttr
 vattr name val = VAttr name (Left $ unsafeCoerce val)
 
+vattrData :: JSString -> JSVal -> VAttr
+vattrData name val = VAttr name (Left val)
+
 vnode :: JSVal -> [VAttr] -> [VDOM] -> VDOM
 vnode = VNode
 
