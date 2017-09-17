@@ -80,6 +80,10 @@ foreign import javascript unsafe "$r = $1;"
 foreign import javascript unsafe "document.body"
   documentBody :: DOMNode
 
+-- | Check if an object has a particular field
+foreign import javascript unsafe "($2[$1] != null)"
+  hasProp :: JSString -> JSVal -> Bool
+
 -- | Extract a String field from a JS object.
 -- TODO: This is unsafe (if the field doesn't exist)
 foreign import javascript unsafe "($2[$1])"
@@ -105,3 +109,14 @@ foreign import javascript unsafe "console.log($1)"
 -- | Print objects to the console.
 foreign import javascript unsafe "console.log($1)"
   consoleLogObj :: JSVal -> IO ()
+
+
+-- AJ: These two functions should be in ghcjs-prim
+
+-- | Convert JS Val to Bool>
+foreign import javascript unsafe "$r = typeof($1) === 'boolean' ? $1: false;"
+  fromJSBool :: JSVal -> Bool
+
+-- | Convert Bool to JS Val.
+foreign import javascript unsafe "$r = $1;"
+  toJSBool :: Bool -> JSVal
