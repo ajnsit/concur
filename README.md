@@ -11,7 +11,7 @@ There are more backends in the works, including one for [React-Native](https://g
 
 The aim is to have a consistent API for all backends, so for example, a web app using react can simply be recompiled as a native GUI. Of course, any native react widgets used by the app would have to be ported to the native platform as well.
 
-
+An example of using Native React Widgets is here - [Drag Drop Sortable List Widget (React)](https://github.com/ajnsit/concur/blob/master/concur-react-components/sortable-tree/src/Main.hs) - [Demo](https://ajnsit.github.io/concur/examples/sortable-tree-example.jsexe/index.html) - Demonstrates Concur binding to [React-Sortable-Tree](https://github.com/fritz-c/react-sortable-tree).
 
 ## Why Concur
 
@@ -43,3 +43,4 @@ This library was originally conceived as a way to improve Elm by adding -
 5. [High/Low Game (React)](https://github.com/ajnsit/concur/blob/master/concur-react/examples/HiLo.hs) - [Demo](https://ajnsit.github.io/concur/examples/concur-react-hilo.jsexe/index.html) - The same HiLo game, using the React backend.
 6. [Kirby Super Star Ultra Splits Timer GUI Challange](https://github.com/ajnsit/concur/blob/master/concur-vdom/examples/KirbySuperStarUltra.hs) - [Demo](https://ajnsit.github.io/concur/examples/kssu.jsexe/index.html) - Concur implementation of the [KSSU Splits Timer GUI Challenge](https://gist.github.com/lexi-lambda/701f1f1282401059f13a4220e8178ba4). Shows a moderately complex UI that's not a todolist!
 7. [Menu Widget (React)](https://github.com/ajnsit/concur/blob/master/concur-react/examples/Menu.hs) - [Demo](https://ajnsit.github.io/concur/examples/concur-react-menu.jsexe/index.html) - Builds a generic menu widget in 10 lines of code.
+8. [Drag Drop Sortable List Widget (React)](https://github.com/ajnsit/concur/blob/master/concur-react-components/sortable-tree/src/Main.hs) - [Demo](https://ajnsit.github.io/concur/examples/sortable-tree-example.jsexe/index.html) - Demonstrates Concur binding to [React-Sortable-Tree](https://github.com/fritz-c/react-sortable-tree). A good example of reusing existing React components in Concur.
