@@ -1,8 +1,8 @@
 {-# LANGUAGE RankNTypes #-}
 module Concur.React.VDOM where
 
-import           GHCJS.Types            (JSString, JSVal)
-import Unsafe.Coerce (unsafeCoerce)
+import           GHCJS.Types   (JSString, JSVal)
+import           Unsafe.Coerce (unsafeCoerce)
 
 -- import Concur.React.Attributes
 
@@ -14,7 +14,7 @@ data VDOM
   | VText JSString
 
 data VAttr = VAttr
-    { attrName :: JSString
+    { attrName  :: JSString
     , attrValue :: Either JSVal (DOMEvent -> IO ())
     }
 

@@ -1,16 +1,16 @@
-{-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE GHCForeignImportPrim #-}
-{-# LANGUAGE MagicHash #-}
+{-# LANGUAGE MagicHash            #-}
+{-# LANGUAGE QuasiQuotes          #-}
 
 module Concur.React.Internal where
 
-import Unsafe.Coerce (unsafeCoerce)
+import           Unsafe.Coerce           (unsafeCoerce)
 
-import GHCJS.Foreign.QQ (js')
-import GHCJS.Types (JSString, JSVal)
-import GHC.Base         (Any)
+import           GHC.Base                (Any)
+import           GHCJS.Foreign.QQ        (js')
+import           GHCJS.Types             (JSString, JSVal)
 
-import Concur.React.Attributes (Attribute(Attribute))
+import           Concur.React.Attributes (Attribute (Attribute))
 
 -- `a` must be a newtype of JSVal!
 mkEventAttr :: JSString -> (a -> IO ()) -> Attribute

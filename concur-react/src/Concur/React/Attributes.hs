@@ -1,14 +1,13 @@
-{-# LANGUAGE QuasiQuotes              #-}
-{-# LANGUAGE FlexibleInstances        #-}
-{-# LANGUAGE GADTs        #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs             #-}
+{-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RankNTypes        #-}
 module Concur.React.Attributes where
 
-import qualified JavaScript.Object.Internal as OI
+import           GHCJS.Foreign.QQ          (jsu')
 import qualified GHCJS.Prim.Internal.Build as IB
-import           GHCJS.Types            (JSString, JSVal)
-import GHCJS.Foreign.QQ
-import Unsafe.Coerce (unsafeCoerce)
+import           GHCJS.Types               (JSString, JSVal)
+import           Unsafe.Coerce             (unsafeCoerce)
 
 newtype Attributes' = Attributes' JSVal
 

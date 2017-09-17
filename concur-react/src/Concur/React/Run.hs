@@ -1,14 +1,17 @@
-{-# LANGUAGE OverloadedStrings        #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Concur.React.Run where
 
-import           Control.Monad.Free     (Free (..))
-import           Concur.Core
-import           Concur.React.VDOM
-import           Concur.React.FFI
-import           Concur.React.Attributes
-import           Data.Maybe             (fromMaybe)
-import           Control.Monad.IO.Class (MonadIO (..))
+import           Concur.Core            (Suspend (..), Widget (..))
+import           Concur.React.FFI       (DOMNode, bakeAttrs, bakeHTML,
+                                         documentBody, mkReactParent,
+                                         renderReactDOM)
+import           Concur.React.VDOM      (HTML)
+
 import           Control.Concurrent.STM (atomically)
+import           Control.Monad.Free     (Free (..))
+import           Control.Monad.IO.Class (MonadIO (..))
+
+import           Data.Maybe             (fromMaybe)
 import           GHCJS.Types            (JSString)
 import           Unsafe.Coerce          (unsafeCoerce)
 
@@ -25,9 +28,7 @@ runWidget (Widget w) root = go w
       case w' of
         Pure a -> liftIO (putStrLn "WARNING: Application exited: This may have been unintentional!") >> return a
         Free ws -> do
-          -- html <- bakeHTML $ view ws
-          -- attrs <- bakeAttrs []
-          html <- mkReactParent (unsafeCoerce ("div" :: JSString)) <$> (bakeAttrs []) <*> (bakeHTML (view ws)) -- $ mkReactParent "div" (mkAttributes ()) $
+          html <- mkReactParent (unsafeCoerce ("div" :: JSString)) <$> (bakeAttrs []) <*> (bakeHTML (view ws))
           renderReactDOM root html
           liftIO $ fromMaybe (return ()) $ runIO ws
           liftIO (atomically $ fromMaybe w' <$> cont ws) >>= go

@@ -2,11 +2,9 @@
 {-# LANGUAGE FlexibleContexts         #-}
 module Concur.React.Widgets where
 
-import           GHCJS.Foreign.Callback
-import           GHCJS.Types                (JSString, JSVal, IsJSVal, jsval)
+import           GHCJS.Types                (JSString, JSVal)
 import qualified GHCJS.Prim.Internal.Build  as IB
 
-import qualified JavaScript.Object.Internal as OI
 import qualified Data.JSString              as JSS
 
 import           Data.Void                  (Void, absurd)
@@ -19,10 +17,8 @@ import           Control.Concurrent.STM     (STM, atomically)
 import           Unsafe.Coerce              (unsafeCoerce)
 
 import           Concur.React.VDOM
-import           Concur.React.Attributes    (Attribute)
 import           Control.MonadShiftMap
 import           Control.MonadSTM
-import           Control.Monad.Trans        (MonadTrans(lift))
 
 -- TODO: Since we can't have a top level text in React. We currently always wrap it in span.
 text :: String -> Widget HTML a

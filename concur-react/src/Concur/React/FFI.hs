@@ -1,13 +1,12 @@
 module Concur.React.FFI where
 
-import           GHCJS.Foreign.Callback
-import           GHCJS.Types            (JSString, JSVal, jsval)
-
+import           GHCJS.Foreign.Callback    (Callback (..), OnBlocked (..),
+                                            syncCallback1)
 import qualified GHCJS.Prim.Internal.Build as IB
-import Unsafe.Coerce (unsafeCoerce)
+import           GHCJS.Types               (JSString, JSVal, jsval)
+import           Unsafe.Coerce             (unsafeCoerce)
 
-import Concur.React.VDOM
-import Concur.React.Attributes
+import           Concur.React.VDOM         (HTML, VAttr (..), VDOM (..))
 
 -- A JS Array of React nodes
 newtype HTML' = HTML' JSVal
@@ -29,7 +28,7 @@ newtype ReactAttributes = ReactAttributes JSVal
 bakeAttrs :: [VAttr] -> IO ReactAttributes
 bakeAttrs attrs = do
   xs <- mapM mkAttr attrs
-  return $ mkAttributes xs
+  return $ mkAttrs xs
   where
     mkAttr (VAttr n (Left v)) = return (unsafeCoerce n, v)
     mkAttr (VAttr n (Right h)) = do
@@ -38,7 +37,7 @@ bakeAttrs attrs = do
       -- https://facebook.github.io/react/docs/events.html#event-pooling
       cb <- syncCallback1 ThrowWouldBlock $ unsafeCoerce h
       return (unsafeCoerce n, jsval cb)
-    mkAttributes xs = ReactAttributes $ IB.buildObjectI xs
+    mkAttrs xs = ReactAttributes $ IB.buildObjectI xs
 
 -- | Convert HTML to HTML'.
 bakeHTML :: HTML -> IO HTML'
