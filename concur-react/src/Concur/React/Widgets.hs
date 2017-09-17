@@ -81,7 +81,7 @@ inputEnter :: [VAttr] -> Widget HTML String
 inputEnter attrs = do
   n <- liftSTM newNotify
   let attr = VAttr "onKeyDown" $ Right (handleKey n . unsafeCoerce)
-  orr [liftSTM $ await n, elLeaf "input" (attr:attrs)]
+  effect [vleaf (unsafeCoerce ("input" :: JSString)) (attr:attrs)] $ await n
   where
     handleKey n = \e -> do
       atomically $ when (getProp "key" e == "Enter") $ notify n $! JSS.unpack $ getProp "value" $ getPropObj "target" e

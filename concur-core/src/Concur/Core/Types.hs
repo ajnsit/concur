@@ -65,7 +65,7 @@ effect :: v -> STM a -> Widget v a
 effect v m = widget v $ Just <$> m
 
 instance Monoid v => MonadSTM (Widget v) where
-  liftSTM m = widget mempty $ Just <$> m
+  liftSTM = effect mempty
 
 instance Monoid v => MonadIO (Widget v) where
   liftIO io = do
