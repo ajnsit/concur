@@ -1,30 +1,11 @@
-{-# LANGUAGE GHCForeignImportPrim #-}
-{-# LANGUAGE MagicHash            #-}
 {-# LANGUAGE OverloadedStrings    #-}
-{-# LANGUAGE QuasiQuotes          #-}
 module Main where
 
-import           Control.Monad              (forever)
-import           Control.Monad.STM          (atomically)
-import           Control.MonadSTM           (MonadSTM (liftSTM))
-
-import           Concur.Core
-import           Concur.React
-
-import           Unsafe.Coerce              (unsafeCoerce)
-
-import           GHCJS.Foreign.QQ           (js')
-import           GHCJS.Prim                 (toJSInt)
-import           GHCJS.Types                (JSString, JSVal)
-
-import qualified Data.JSString              as JSS
-
-import           Concur.React.Attributes    (Attribute (Attribute))
-
-import qualified GHCJS.Prim.Internal.Build  as IB
-import qualified JavaScript.Object.Internal as OI
-
-import           Concur.React.Components.SortableTree (TreeData (..), sortableTree)
+import           Concur.React                         (ReactStyle (..), el, el_,
+                                                       reactStyle,
+                                                       runWidgetInBody, text)
+import           Concur.React.Components.SortableTree (TreeData (..),
+                                                       sortableTree)
 
 main :: IO ()
 main = runWidgetInBody $
