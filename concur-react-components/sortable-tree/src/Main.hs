@@ -1,9 +1,8 @@
-{-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import           Concur.React                         (ReactStyle (..), el, el_,
-                                                       reactStyle,
-                                                       runWidgetInBody, text)
+import           Concur.React                         (el, el_, runWidgetInBody,
+                                                       text, vstyleStr)
 import           Concur.React.Components.SortableTree (TreeData (..),
                                                        sortableTree)
 
@@ -26,14 +25,14 @@ main = runWidgetInBody $
                       ]
                   ]
   where
-    parentStyle = reactStyle
-      [("display", StyleString "flex")
-      ,("height", StyleString "800px")
+    parentStyle =
+      [ vstyleStr "display" "flex"
+      , vstyleStr "height" "800px"
       ]
-    childStyle = reactStyle [("width", StyleString "50%")]
+    childStyle = [vstyleStr "width" "50%"]
     showTree items = do
-      modifiedItems <- el "div" [parentStyle]
-        [ el_ "div" [childStyle] $ sortableTree items
-        , el_ "div" [childStyle] $ text $ show items
+      modifiedItems <- el "div" parentStyle
+        [ el_ "div" childStyle $ sortableTree items
+        , el_ "div" childStyle $ text $ show items
         ]
       showTree modifiedItems
