@@ -1,6 +1,3 @@
-[submodule "ghcjs-ffiqq"]
-	path = concur-react/ghcjs-ffiqq
-	url = https://github.com/ghcjs/ghcjs-ffiqq.git
 [submodule "ghcjs-vdom"]
 	path = concur-vdom/ghcjs-vdom
 	url = https://github.com/ajnsit/ghcjs-vdom.git
