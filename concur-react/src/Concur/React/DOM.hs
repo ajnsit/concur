@@ -47,6 +47,12 @@ vevt name handler = VAttr name (Right handler)
 vattr :: JSString -> JSString -> VAttr
 vattr name val = VAttr name (Left $ unsafeCoerce val)
 
+vstyleStr :: JSString -> JSString -> VAttr
+vstyleStr name val = VStyle name (StyleString val)
+
+vstyleVal :: JSString -> JSVal -> VAttr
+vstyleVal name val = VStyle name (StyleVal val)
+
 vattrData :: JSString -> JSVal -> VAttr
 vattrData name val = VAttr name (Left val)
 
@@ -163,16 +169,3 @@ consoleLog = js_consoleLog
 consoleLogObj :: JSVal -> IO ()
 consoleLogObj = js_consoleLogObj
 {-# INLINE consoleLogObj #-}
-
-
--- AJ: These two functions should be in ghcjs-prim
-
--- | Convert JS Val to Bool>
-fromJSBool :: JSVal -> Bool
-fromJSBool = js_fromJSBool
-{-# INLINE fromJSBool #-}
-
--- | Convert Bool to JS Val.
-toJSBool :: Bool -> JSVal
-toJSBool = js_toJSBool
-{-# INLINE toJSBool #-}
