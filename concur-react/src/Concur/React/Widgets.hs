@@ -3,7 +3,6 @@
 module Concur.React.Widgets where
 
 import           GHCJS.Types                (JSString, JSVal)
-import qualified GHCJS.Prim.Internal.Build  as IB
 
 import qualified Data.JSString              as JSS
 
@@ -11,12 +10,11 @@ import           Data.Void                  (Void, absurd)
 
 import           Control.Monad              (void, when)
 import           Concur.Core
-import           Concur.React.FFI
 import           Control.Concurrent.STM     (STM, atomically)
 
 import           Unsafe.Coerce              (unsafeCoerce)
 
-import           Concur.React.VDOM
+import           Concur.React.DOM
 import           Control.MonadShiftMap
 import           Control.MonadSTM
 
@@ -81,18 +79,3 @@ inputEnter attrs = do
   where
     handleKey n = \e -> do
       atomically $ when (getProp "key" e == "Enter") $ notify n $! JSS.unpack $ getProp "value" $ getPropObj "target" e
-
-
-----------------------------
--- REACT STYLE ATTRIBUTES --
-----------------------------
-
-data ReactStyle = StyleString JSString | StyleVal JSVal
-
--- Utility to construct a react style attribute
-reactStyle :: [(JSString, ReactStyle)] -> VAttr
-reactStyle styleValues = vattrData "style" $ IB.buildObjectI $ map mkStyle styleValues
-  where
-    mkStyle (k,v) = (unsafeCoerce k, mkVal v)
-    mkVal (StyleString s) = unsafeCoerce s
-    mkVal (StyleVal v) = v

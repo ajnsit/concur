@@ -2,14 +2,14 @@ resolver: lts-7.19
 packages:
 - .
 - ../concur-core
-extra-deps: []
-# - ghcjs-dom-0.9.2.0
-# - jsaddle-0.9.4.0
-# - jsaddle-warp-0.9.4.0
-# - jsaddle-wkwebview-0.9.4.0
-# - ghcjs-dom-jsaddle-0.9.2.0
-# - ref-tf-0.4.0.1
-# - jsaddle-dom-0.9.2.0
+extra-deps:
+- ghcjs-dom-0.9.2.0
+- ghcjs-dom-jsaddle-0.9.2.0
+- jsaddle-0.9.4.0
+- jsaddle-dom-0.9.2.0
+- natural-transformation-0.4
+- ref-tf-0.4.0.1
+# TODO: THIS OR JSADDLE/GHCJS-DOM
+- ghcjs-base-stub-0.1.0.3
 flags: {}
 extra-package-dbs: []
-

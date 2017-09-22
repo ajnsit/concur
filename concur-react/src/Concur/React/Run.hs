@@ -2,10 +2,9 @@
 module Concur.React.Run where
 
 import           Concur.Core            (Suspend (..), Widget (..))
-import           Concur.React.FFI       (DOMNode, bakeAttrs, bakeHTML,
+import           Concur.React.DOM       (DOMNode, bakeAttrs, bakeReactHTML,
                                          documentBody, mkReactParent,
-                                         renderReactDOM)
-import           Concur.React.VDOM      (HTML)
+                                         renderReactDOM, HTML)
 
 import           Control.Concurrent.STM (atomically)
 import           Control.Monad.Free     (Free (..))
@@ -28,7 +27,7 @@ runWidget (Widget w) root = go w
       case w' of
         Pure a -> liftIO (putStrLn "WARNING: Application exited: This may have been unintentional!") >> return a
         Free ws -> do
-          html <- mkReactParent (unsafeCoerce ("div" :: JSString)) <$> (bakeAttrs []) <*> (bakeHTML (view ws))
+          html <- mkReactParent (unsafeCoerce ("div" :: JSString)) <$> (bakeAttrs []) <*> (bakeReactHTML (view ws))
           renderReactDOM root html
           liftIO $ fromMaybe (return ()) $ runIO ws
           liftIO (atomically $ fromMaybe w' <$> cont ws) >>= go
