@@ -1,0 +1,8 @@
+resolver: lts-7.19
+packages:
+- .
+- ../../diferencia/
+extra-deps:
+- ghcjs-base-stub-0.1.0.3
+flags: {}
+extra-package-dbs: []
