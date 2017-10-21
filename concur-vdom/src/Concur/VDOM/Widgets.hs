@@ -73,7 +73,12 @@ text s = display [E.text $ JSS.pack s]
 
 -- A clickable button widget
 button :: String -> Widget HTML ()
-button s = clickEl E.button [] (const ()) [text s]
+button s = do
+  -- This could simply be written as -
+  -- clickEl E.button [] (const ()) [text s]
+  -- But we unwrap abstractions for performance
+  n <- liftSTM newNotify
+  effect [E.button [Ev.click (atomically . notify n)] [E.text $ JSS.pack s]] (await n >> return ())
 
 -- An Element which can be clicked
 clickEl :: HTMLNodeName [A.Attribute] -> [A.Attribute] -> (Ev.MouseEvent -> a) -> [Widget HTML a] -> Widget HTML a
