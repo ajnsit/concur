@@ -43,7 +43,7 @@ runWidgetLoading (Widget w) root loading = do
     go mnt w' = do
       case w' of
         Pure a -> liftIO (putStrLn "WARNING: Application exited: This may have been unintentional!") >> return a
-        Free ws -> do
+        Free (Suspend io) -> liftIO io >>= \ws -> do
           void $ diff mnt (E.div () $ view ws) >>= patch mnt
           liftIO $ fromMaybe (return ()) $ runIO ws
           liftIO (atomically $ fromMaybe w' <$> cont ws) >>= go mnt

@@ -9,7 +9,7 @@ import           Concur.VDOM.Run               (HTML, HTMLNodeName)
 import           Control.Applicative           (Alternative, empty, (<|>))
 import           Control.Concurrent            (forkIO, threadDelay)
 import           Control.Concurrent.STM        (STM, atomically)
-import           Control.Monad                 (forever)
+import           Control.Monad                 (forever, void)
 import           Control.Monad.IO.Class        (MonadIO (..))
 import           Control.Monad.State           (execStateT, get, lift, put,
                                                 when)
@@ -73,12 +73,7 @@ text s = display [E.text $ JSS.pack s]
 
 -- A clickable button widget
 button :: String -> Widget HTML ()
-button s = do
-  -- This could simply be written as -
-  -- clickEl E.button [] (const ()) [text s]
-  -- But we unwrap abstractions for performance
-  n <- liftSTM newNotify
-  effect [E.button [Ev.click (atomically . notify n)] [E.text $ JSS.pack s]] (await n >> return ())
+button s = void $ awaitViewAction $ \n -> [E.button [Ev.click (atomically . notify n)] [E.text $ JSS.pack s]]
 
 -- An Element which can be clicked
 clickEl :: HTMLNodeName [A.Attribute] -> [A.Attribute] -> (Ev.MouseEvent -> a) -> [Widget HTML a] -> Widget HTML a
