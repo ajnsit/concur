@@ -16,6 +16,7 @@ module Concur.Core.Types
   , effect
   , awaitViewAction
   , MultiAlternative(..)
+  , loadWithIO
   ) where
 
 import           Concur.Core.Notify       (Notify, await, newNotifyIO, notify)
@@ -84,9 +85,12 @@ awaitViewAction f = continue $ Suspend $ do
 withNotifyS :: (Notify a -> SuspendF v a) -> Widget v a
 withNotifyS f = continue $ Suspend $ fmap f newNotifyIO
 
+loadWithIO :: v -> IO a -> Widget v a
+loadWithIO v io = withNotifyS $ \n ->
+    SuspendF v (Just $ void $ forkIO $ io >>= atomically . notify n) $ Just <$> await n
+
 instance Monoid v => MonadIO (Widget v) where
-  liftIO io = withNotifyS $ \n ->
-    SuspendF mempty (Just $ void $ forkIO $ io >>= atomically . notify n) $ Just <$> await n
+  liftIO = loadWithIO mempty
 
 -- IMPORTANT NOTE: This Alternative instance is NOT the same one as that for Free.
 -- That one simply uses Alternative for Suspend. But that one isn't sufficient for us.
