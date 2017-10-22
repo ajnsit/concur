@@ -75,6 +75,9 @@ text s = display [E.text $ JSS.pack s]
 button :: String -> Widget HTML ()
 button s = void $ awaitViewAction $ \n -> [E.button [Ev.click (atomically . notify n)] [E.text $ JSS.pack s]]
 
+button' :: [A.Attribute] -> String -> Widget HTML ()
+button' a s = void $ awaitViewAction $ \n -> [E.button (Ev.click (atomically . notify n) : a) [E.text $ JSS.pack s]]
+
 -- An Element which can be clicked
 clickEl :: HTMLNodeName [A.Attribute] -> [A.Attribute] -> (Ev.MouseEvent -> a) -> [Widget HTML a] -> Widget HTML a
 clickEl e attrs onClick children = either onClick id <$> elEvent Ev.click e attrs (orr children)
@@ -134,10 +137,7 @@ inputWithButton label def = do
 
 -- A Checkbox
 checkbox :: Bool -> Widget HTML Bool
-checkbox checked = do
-  n <- liftSTM newNotify
-  let chk = E.input (Ev.click (const $ atomically $ notify n (not checked))) ()
-  effect [chk] $ await n
+checkbox checked = awaitViewAction $ \n -> [E.input (Ev.click (const $ atomically $ notify n (not checked))) ()]
 
 -- Generic Element wrapper (single child widget)
 el_ :: MonadShiftMap (Widget HTML) m => HTMLNodeName [A.Attribute] -> [A.Attribute] -> m a -> m a
