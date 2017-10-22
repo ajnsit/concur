@@ -9,5 +9,6 @@ extra-deps:
 - ref-tf-0.4.0.1
 - jsaddle-dom-0.9.1.0
 - jsaddle-wkwebview-0.9.0.0
+- natural-transformation-0.4
 flags: {}
 extra-package-dbs: []
