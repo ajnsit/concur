@@ -13,6 +13,8 @@ The aim is to have a consistent API for all backends, so for example, a web app 
 
 An example of using Native React Widgets is here - [Drag Drop Sortable List Widget (React)](https://github.com/ajnsit/concur/blob/master/concur-react-components/sortable-tree/src/Main.hs) - [Demo](https://ajnsit.github.io/concur/examples/sortable-tree-example.jsexe/index.html) - Demonstrates Concur binding to [React-Sortable-Tree](https://github.com/fritz-c/react-sortable-tree).
 
+Access some performance benchmarks here - https://ajnsit.github.io/concur-benchmarks/
+
 ## Why Concur
 
 ### NOTE: I need to write better docs. Until then, there is some good information in my answer on [Comparison with Elm/Miso](https://github.com/ajnsit/concur/issues/1#issuecomment-328372111)
