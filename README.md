@@ -9,7 +9,9 @@ It has two backends -
 
 There are more backends in the works, including one for [React-Native](https://github.com/facebook/react-native), and for Native UI toolkits like [FLTK](https://github.com/deech/fltkhs).
 
-The aim is to have a consistent API for all backends, so for example, a web app using react can simply be recompiled as a native GUI. Of course, any native react widgets used by the app would have to be ported to the native platform as well.
+There is a Work-In-Progress Extremely-Experimental backend called [concur-doom](concur-doom) which explores constructing DOM elements once and then editing only the parts that change, without dom-diffing, and while maintaining pure view rendering as well as having the same API as the other virtual-dom based backends.
+
+The eventual aim is to have a consistent API for all backends, so for example, a web app using react can simply be recompiled as a native GUI. Of course, any native react widgets used by the app would have to be ported to the native platform as well.
 
 An example of using Native React Widgets is here - [Drag Drop Sortable List Widget (React)](https://github.com/ajnsit/concur/blob/master/concur-react-components/sortable-tree/src/Main.hs) - [Demo](https://ajnsit.github.io/concur/examples/sortable-tree-example.jsexe/index.html) - Demonstrates Concur binding to [React-Sortable-Tree](https://github.com/fritz-c/react-sortable-tree).
 
