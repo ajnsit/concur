@@ -1,10 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Concur.React.Run where
 
-import           Concur.Core            (Suspend (..), Widget (..))
-import           Concur.React.DOM       (DOMNode, bakeAttrs, bakeReactHTML,
-                                         documentBody, mkReactParent,
-                                         renderReactDOM, HTML)
+import           Concur.Core            (Suspend (..), SuspendF (..),
+                                         Widget (..))
+import           Concur.React.DOM       (DOMNode, HTML, bakeAttrs,
+                                         bakeReactHTML, documentBody,
+                                         mkReactParent, renderReactDOM)
 
 import           Control.Concurrent.STM (atomically)
 import           Control.Monad.Free     (Free (..))
@@ -26,7 +27,7 @@ runWidget (Widget w) root = go w
     go w' = do
       case w' of
         Pure a -> liftIO (putStrLn "WARNING: Application exited: This may have been unintentional!") >> return a
-        Free ws -> do
+        Free (Suspend io) -> liftIO io >>= \ws -> do
           html <- mkReactParent (unsafeCoerce ("div" :: JSString)) <$> (bakeAttrs []) <*> (bakeReactHTML (view ws))
           renderReactDOM root html
           liftIO $ fromMaybe (return ()) $ runIO ws
