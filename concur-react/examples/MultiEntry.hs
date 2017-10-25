@@ -1,9 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TupleSections     #-}
 module Main where
 
 import           Control.Monad        (forever, void)
-import           Control.Monad.State  (execStateT, get, lift, modify)
+import           Control.Monad.State  (execStateT, get, put, lift)
 
 import           Concur.Core
 import           Concur.React
@@ -26,28 +27,43 @@ menu label items = el_ "div" [vattr "className" "menu"] $ do
   where
     menuButton (ret,str) = ret <$ button' [] (text str)
 
-data EntriesState = EntriesState { color :: String, entries :: [String] }
-main :: IO ()
-main = void $ runWidgetInBody $ flip execStateT (EntriesState "Red" []) $
-  forever $ el "div" [vattr "className" "main"]
-    [ lift $ el_ "h1" [] $ text "Select a color"
-    , selColor
-    , lift $ el_ "h1" [] $ text "Make entries"
-    , newEntry
-    , lift $ el_ "h1" [] $ text "Current entries"
-    , entriesList
-    ]
+-- State
+data EntryState = EntryState { color :: String, items :: [String] }
+data EntriesState = EntriesState { entries :: [EntryState] }
+
+entryStateInit :: EntryState
+entryStateInit = EntryState "Red" []
+entriesStateInit :: Int -> EntriesState
+entriesStateInit n = EntriesState $ replicate n entryStateInit
+
+-- Widget that allows the user to add an item to an entry
+entryWidget :: EntryState -> Widget HTML EntryState
+entryWidget (EntryState {..}) = go color
   where
-    selColor = do
-      c <- lift $ doubleMenu "Fruits" "Color" itemsFruit itemsColor
-      modify $ \s -> s { color = c }
-    newEntry = do
-      EntriesState {..} <- get
-      e <- lift $ menu ("New Entry for " ++ color ++ " fruit") $ itemsFruitColor color
-      modify $ \s -> s { entries = e : entries }
-    entriesList = do
-      EntriesState {..} <- get
-      lift $ orr $ map (el_ "div" [] . text) entries
+    go col =
+      el "div" [vattr "className" "main"]
+        [ elLeaf "hr" []
+        , heading "Select a color"
+        , Left <$> selColor
+        , heading "Make entries"
+        , Right <$> newEntry col
+        , heading "Current entries"
+        , entriesList
+        ]
+      >>= either go (\e -> return (EntryState col (e:items)))
+    heading = el_ "h4" [] . text
+    selColor = doubleMenu "Fruits" "Color" itemsFruit itemsColor
+    newEntry col = menu ("New Entry for " ++ col ++ " fruit") (itemsFruitColor col)
+    entriesList = orr $ map (el_ "div" [] . text) items
+
+-- Main
+main :: IO ()
+main = void $ runWidgetInBody $ flip execStateT (entriesStateInit 5) $ forever $ do
+    EntriesState {..} <- get
+    (i, e') <- lift $ orr (renderEntry <$> zip [0..] entries)
+    put $ EntriesState (take i entries ++ [e'] ++ drop (i+1) entries)
+  where
+    renderEntry (i,e) = (i,) <$> entryWidget e
 
 -- Items for first menu
 itemsFruit :: MenuItems String

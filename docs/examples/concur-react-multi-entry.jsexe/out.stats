@@ -1,16 +1,15 @@
 code size summary per package:
 
-base:                    310767
-concur-core-0.1.0.0-4hdRBt3Nchl3rZV5SxCMoZ:11995
-concur-react-0.1.0.0-FSrjX4A0yeX4FbeNXwWMW0:18731
+base:                    310761
+concur-core-0.1.0.0-4hdRBt3Nchl3rZV5SxCMoZ:11818
+concur-react-0.1.0.0-FSrjX4A0yeX4FbeNXwWMW0:19543
 deepseq-1.4.2.0-47yvsc92PQF1rYmebWoAXZ:878
 free-4.12.4-4DU15KXPdzZ2FhNPNvDKhk:2488
 ghc-prim:                6107
 ghcjs-base-0.2.0.0-GiGsdYOoO5CISyJ2m7ax9F:4356
 ghcjs-prim-0.1.0.0-IFhsWclGfLr1HfhUvIVylA:10652
 integer-gmp:             2311
-main:                    39141
-transformers-0.5.2.0-Lvs3wlJMkpyLRFNHJ8pmeB:368
+main:                    47207
 
 
 code size per module:
@@ -63,15 +62,15 @@ base
     GHC.Storable:                       1070
     GHC.TopHandler:                     12934
     GHC.Word:                           923
-    System.Posix.Internals:             15316
+    System.Posix.Internals:             15310
 
 concur-core-0.1.0.0-4hdRBt3Nchl3rZV5SxCMoZ
     Concur.Core.Types:                  11649
-    Control.MonadShiftMap:              346
+    Control.MonadShiftMap:              169
 
 concur-react-0.1.0.0-FSrjX4A0yeX4FbeNXwWMW0
     Concur.Internal.ReactFFI:           214
-    Concur.React.DOM:                   9623
+    Concur.React.DOM:                   10435
     Concur.React.Run:                   5184
     Concur.React.Widgets:               3710
 
@@ -100,12 +99,9 @@ integer-gmp
     GHC.Integer.Type:                   2311
 
 main
-    Main:                               39141
-
-transformers-0.5.2.0-Lvs3wlJMkpyLRFNHJ8pmeB
-    Control.Monad.Trans.State.Lazy:     368
+    Main:                               47207
 
 
 
-packed metadata: 90896
+packed metadata: 93069
 
