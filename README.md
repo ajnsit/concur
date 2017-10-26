@@ -1,4 +1,7 @@
-# Concur
+<h1 align="center">Concur</h1>
+<p align="center">
+   <img src="docs/logo.png" height="100">
+</p>
 
 A brand new client side Web UI framework for Haskell that explores an entirely new paradigm. It does not follow FRP (think Reflex or Reactive Banana), or Elm architecture, but aims to combine the best parts of both.
 
