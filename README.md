@@ -23,7 +23,7 @@ Access some performance benchmarks here - https://ajnsit.github.io/concur-benchm
 
 ## Why Concur
 
-### NOTE: I need to write better docs. Until then, there is some good information in my answer on [Comparison with Elm/Miso](https://github.com/ajnsit/concur/issues/1#issuecomment-328372111)
+### NOTE: I need to write better docs. Until then, there is some good information in my answer on [Comparison with Elm/Miso](https://github.com/ajnsit/concur/issues/1#issuecomment-328372111) and my comment on Reddit on [Comparison with Reflex](https://www.reddit.com/r/haskell/comments/785zvm/highlevel_survey_of_functional_reactive_ui/dos1rlx/)
 
 ### The UI problem
 
