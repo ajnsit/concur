@@ -7,8 +7,9 @@ A brand new client side Web UI framework for Haskell that explores an entirely n
 
 It has two backends -
 
-1. [React](https://github.com/facebook/react) based, called [concur-react](concur-react).
-2. [Virtual-Dom](https://github.com/Matt-Esch/virtual-dom) based, called [concur-vdom](concur-vdom).
+1. [React](https://github.com/facebook/react) based, called [concur-react](concur-react). You can use the [Concur-React Quickstart Template](https://github.com/concurhaskell/concur-react-starter) to quickly get started.
+
+2. [Virtual-Dom](https://github.com/Matt-Esch/virtual-dom) based, called [concur-vdom](concur-vdom). You can use the [Concur-Vdom Quickstart Template](https://github.com/concurhaskell/concur-vdom-starter) to quickly get started.
 
 There are more backends in the works, including one for [React-Native](https://github.com/facebook/react-native), and for Native UI toolkits like [FLTK](https://github.com/deech/fltkhs).
 
