@@ -20,6 +20,7 @@ library
   exposed-modules:     Concur.Core
                      , Concur.Core.Types
                      , Concur.Core.Notify
+                     , Concur.Core.Pipe
                      , Control.MonadSTM
                      , Control.MonadShiftMap
                      , Control.MultiAlternative

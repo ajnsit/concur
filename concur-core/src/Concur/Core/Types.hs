@@ -16,7 +16,6 @@ module Concur.Core.Types
   , awaitViewAction
   , MultiAlternative(..)
   , loadWithIO
-  , pipe
   ) where
 
 import           Concur.Core.Notify       (Notify, await, newNotifyIO, notify)
@@ -119,10 +118,3 @@ instance Monoid v => MultiAlternative (Widget v) where
 
 -- The default instance derives from Alternative
 instance Monoid v => MonadPlus (Widget v)
-
-pipe :: Monoid v => Widget v a -> (a -> Widget v x) -> a -> Widget v x
-pipe w f defa = do
-  er <- (Left <$> w) <|> (Right <$> f defa)
-  case er of
-    Left a -> pipe w f a
-    Right x -> return x
