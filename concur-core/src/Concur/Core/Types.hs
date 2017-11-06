@@ -7,7 +7,6 @@ module Concur.Core.Types
   , continue
   , widget
   , display
-  , never
   , mapView
   , wrapView
   , Suspend(..)
@@ -28,7 +27,7 @@ import           Control.Monad            (MonadPlus (..), void)
 import           Control.Monad.Free       (Free (..), hoistFree, liftF)
 import           Control.Monad.IO.Class   (MonadIO, liftIO)
 import           Control.MonadSTM         (MonadSTM (..))
-import           Control.MultiAlternative (MultiAlternative, orr)
+import           Control.MultiAlternative (MultiAlternative, orr, never)
 
 newtype Widget v a = Widget { suspend :: Free (Suspend v) a }
   deriving (Functor, Applicative, Monad)
@@ -49,10 +48,6 @@ widget v r = continue $ Suspend $ return $ SuspendF v Nothing r
 
 display :: v -> Widget v a
 display v = widget v retry
-
--- Never returns, use as an identity for <|>
-never :: Monoid v => Widget v a
-never = display mempty
 
 -- Change the view of a Widget
 mapView :: (u -> v) -> Widget u a -> Widget v a
@@ -93,6 +88,7 @@ loadWithIO v io = withNotifyS $ \n ->
 instance Monoid v => MonadIO (Widget v) where
   liftIO = loadWithIO mempty
 
+
 -- IMPORTANT NOTE: This Alternative instance is NOT the same one as that for Free.
 -- That one simply uses Alternative for Suspend. But that one isn't sufficient for us.
 -- Verify laws:
@@ -105,6 +101,7 @@ instance Monoid v => Alternative (Widget v) where
   f <|> g = orr [f,g]
 
 instance Monoid v => MultiAlternative (Widget v) where
+  never = display mempty
   orr = Widget . comb . map suspend
     where
       peelAllFree []           = Right []
