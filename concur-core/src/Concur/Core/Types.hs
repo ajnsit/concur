@@ -16,9 +16,10 @@ module Concur.Core.Types
   , awaitViewAction
   , MultiAlternative(..)
   , loadWithIO
+  , remoteWidget
   ) where
 
-import           Concur.Core.Notify       (Notify, await, newNotifyIO, notify)
+import           Concur.Core.Notify       (Notify, await, newNotify, newNotifyIO, notify)
 import           Control.Applicative      (Alternative, empty, (<|>))
 import           Control.Concurrent       (forkIO)
 import           Control.Concurrent.STM   (STM, atomically, retry)
@@ -84,9 +85,17 @@ loadWithIO :: v -> IO a -> Widget v a
 loadWithIO v io = withNotifyS $ \n ->
     SuspendF v (Just $ void $ forkIO $ io >>= atomically . notify n) $ Just <$> await n
 
+-- Make a Widget, which can be pushed to remotely
+remoteWidget :: (MultiAlternative m, MonadSTM m, Monad m) => m b -> (a -> m b) -> STM (a -> m (), m b)
+remoteWidget d f = do
+  var <- newNotify
+  return (proxy var, wid var d)
+  where
+    proxy var = \a -> liftSTM $ notify var a
+    wid var ui = orr [Left <$> ui, Right <$> (liftSTM $ await var)] >>= either return (wid var . f)
+
 instance Monoid v => MonadIO (Widget v) where
   liftIO = loadWithIO mempty
-
 
 -- IMPORTANT NOTE: This Alternative instance is NOT the same one as that for Free.
 -- That one simply uses Alternative for Suspend. But that one isn't sufficient for us.
