@@ -1,13 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import Control.Applicative ((<|>))
+import Control.MonadSTM
 
 import Concur.Core
 import Concur.React
 
--- Our possible actions
+-- Possible actions emited by the Calculator buttons
 data CalculatorAction = Plus | Minus | Times | Div | Enter | Clear | Digit Int
+  deriving Show
 
 -- Button pad widget
 calcButtonsWidget :: Widget HTML CalculatorAction
@@ -41,14 +42,46 @@ calc s       _         = (s,0)
 new :: Int -> [Int] -> ([Int], Int)
 new n s = (n:s, n)
 
--- Calc display
-calcDisplay :: Int -> Widget HTML x
-calcDisplay n = el "div" [] [text $ show n]
-
--- Hooking up everything is easy
-main :: IO ()
-main = runWidgetInBody $ go 0 []
+-- Hooking up everything is pretty easy as can be seen in `mainStandard`
+mainStandard :: IO ()
+mainStandard = runWidgetInBody $ go 0 []
   where
     go n s = do
-      a <- calcDisplay n <|> calcButtonsWidget
+      a <- orr [text (show n), calcButtonsWidget]
       let (s', n') = calc s a in go n' s'
+
+-- But in this example we don't use this "standard" way of doing things
+
+-- Instead, we show off remote widgets to drive the display
+-- This code may seem longer, but it's sometimes much cleaner to use "action at a distance".
+-- It's also very useful to avoid having to rework complex logic.
+
+-- We first create a widget that handles wiring up the buttons and calculation
+-- Notice the extremely straightforward flow.
+-- We also don't need to worry WHERE and HOW the result is displayed
+buttonsWidget :: (Int -> Widget HTML ()) -> Widget HTML y
+buttonsWidget showResultWidget = go []
+  where
+    -- This Widget effectively -
+    go st = do
+      -- 1. Displays the calculator buttons
+      a <- calcButtonsWidget
+      -- 2. Updates the state of the calculation when a button is pressed
+      let (st', n) = calc st a
+      -- 3. Uses the widget passed in to display the current result
+      showResultWidget n
+      -- 4. Repeats
+      go st'
+
+-- Create a remote calculator display which can be controlled by other widgets
+makeCalcDisplay :: Widget HTML (Int -> Widget HTML (), Widget HTML x)
+makeCalcDisplay = liftSTM $ remoteWidget defaultDisplay handleResult
+  where
+    defaultDisplay = text "This display is controlled by other widgets. GO AHEAD. PRESS A BUTTON."
+    handleResult res = text $ show res
+
+-- Now we wire them together easily
+main :: IO ()
+main = runWidgetInBody $ do
+  (showResult, calcDisp) <- makeCalcDisplay
+  el "div" [] [calcDisp, buttonsWidget showResult]
