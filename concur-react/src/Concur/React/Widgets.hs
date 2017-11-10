@@ -22,9 +22,13 @@ import           Control.MonadSTM
 text :: String -> Widget HTML a
 text txt = display [vtext $ JSS.pack txt]
 
+-- Like el_ but accepts a React Component reference instead of a tagname
+elComp :: (MonadShiftMap (Widget HTML) m) => JSVal -> [VAttr] -> m a -> m a
+elComp e attrs = shiftMap (wrapView (vnode e attrs))
+
 -- Generic Element wrapper (single child widget)
 el_ :: (MonadShiftMap (Widget HTML) m) => JSString -> [VAttr] -> m a -> m a
-el_ e attrs = shiftMap (wrapView (vnode (unsafeCoerce e) attrs))
+el_ = elComp . unsafeCoerce
 
 -- Generic Element wrapper
 el :: (MonadShiftMap (Widget HTML) m, MultiAlternative m) => JSString -> [VAttr] -> [m a] -> m a
@@ -37,6 +41,7 @@ elLeaf e attrs = display [vleaf (unsafeCoerce e) attrs]
 -- Helper
 mkEventHandlerAttr :: JSString -> STM (VAttr, STM JSVal)
 mkEventHandlerAttr evtName = do
+  -- TODO: Use blocking IO
   n <- newNotify
   let attr = VAttr evtName $ Right (atomically . notify n . unsafeCoerce)
   return (attr, await n)
@@ -49,9 +54,28 @@ elEvent :: (MonadShiftMap (Widget HTML) m, MultiAlternative m, Monad m, MonadSTM
         -> [VAttr]
         -> m a
         -> m a
-elEvent evtName xtract tag attrs child = do
+elEvent evtName xtract tag attrs child = elEventComp evtName xtract (unsafeCoerce tag) attrs child
+
+-- Like elEvent, but works for arbitrary react components
+elEventComp :: (MonadShiftMap (Widget HTML) m, MultiAlternative m, Monad m, MonadSTM m)
+        => JSString
+        -> (JSVal -> a)
+        -> JSVal
+        -> [VAttr]
+        -> m a
+        -> m a
+elEventComp evtName xtract e attrs child = do
   (a,w) <- liftSTM $ mkEventHandlerAttr evtName
-  orr [fmap xtract $ liftSTM w, el_ tag (a:attrs) child]
+  orr [fmap xtract $ liftSTM w, elComp e (a:attrs) child]
+
+-- Similar to elEventComp, but specialised to the case where there are no child events.
+elEventComp' :: (MonadShiftMap (Widget HTML) m, MultiAlternative m, Monad m, MonadSTM m)
+         => JSString
+         -> JSVal
+         -> [VAttr]
+         -> m Void
+         -> m JSVal
+elEventComp' evtName comp attrs child = elEventComp evtName id comp attrs (fmap absurd child)
 
 -- Similar to elEvent, but specialised to the case where there are no child events.
 elEvent' :: (MonadShiftMap (Widget HTML) m, MultiAlternative m, Monad m, MonadSTM m)
