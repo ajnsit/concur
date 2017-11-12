@@ -21,7 +21,6 @@ dependencies:
 - free >=4.12
 - concur-core
 library:
-  js-sources: jsbits/index.compiled.js
   source-dirs: src
   exposed-modules:
   - Concur.React
