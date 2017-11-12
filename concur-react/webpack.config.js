@@ -6,10 +6,5 @@ module.exports = {
         // export itself to a global var: "h$concur"
         libraryTarget: "var",
         library: "h$concur"
-    },
-    externals: {
-        // Load React deps from the concur-react library
-        "react": "h$concur.react",
-        "react-dom": "h$concur.reactDom"
     }
 };

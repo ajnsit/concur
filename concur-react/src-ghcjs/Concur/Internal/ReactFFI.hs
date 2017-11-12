@@ -10,15 +10,15 @@ foreign import javascript unsafe "window.requestAnimationFrame($1)"
   js_requestAnimationFrame :: Callback (IO ()) -> IO ()
 
 -- Render a React App
-foreign import javascript unsafe "h$concur.ReactDOM.render($2, $1)"
+foreign import javascript unsafe "h$concur.reactDom.render($2, $1)"
   js_renderReactDOM :: JSVal -> JSVal -> IO ()
 
 -- | PURE: Construct a react dom node with children.
-foreign import javascript unsafe "h$concur.React.createElement($1, $2, $3)"
+foreign import javascript unsafe "h$concur.react.createElement($1, $2, $3)"
   js_mkReactParent :: JSVal -> Object -> JSArray -> JSVal
 
 -- | PURE: Construct a react dom node without children.
-foreign import javascript unsafe "h$concur.React.createElement($1, $2)"
+foreign import javascript unsafe "h$concur.react.createElement($1, $2)"
   js_mkReactLeaf :: JSVal -> Object -> JSVal
 
 -- | PURE: Construct a text dom node.
