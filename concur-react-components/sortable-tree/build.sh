@@ -1,3 +1,3 @@
 #!/bin/bash
 webpack
-stack build --stack-yaml stack-ghcjs.yaml --no-nix
+stack build --stack-yaml stack-ghcjs.yaml
