@@ -1,0 +1,62 @@
+name: concur-react
+version: '0.1.0.0'
+synopsis: A client side web UI framework for Haskell. React bindings.
+description: A client side web UI framework for Haskell. React bindings.
+category: Web
+author: Anupam Jain
+maintainer: ajnsit@gmail.com
+copyright: 2017 (C) All Rights Reserved.
+license: BSD3
+github: ajnsit/concur
+extra-source-files:
+- README.md
+ghc-options:
+- -Wall
+- -ferror-spans
+dependencies:
+- base >=4.7 && <5
+- mtl >=2.2
+- transformers >=0.5
+- stm >=2.4
+- free >=4.12
+- concur-core
+library:
+  source-dirs: src
+  exposed-modules:
+  - Concur.React
+  - Concur.React.DOM
+  - Concur.React.Widgets
+  - Concur.React.Run
+  - Concur.Internal.ReactFFI
+  when:
+  - condition: impl(ghcjs -any)
+    then:
+      source-dirs: src-ghcjs
+      dependencies:
+      - ghcjs-base
+    else:
+      source-dirs: src-ghc
+      dependencies:
+      - ghcjs-base-stub >=0.1
+executables:
+  concur-react-multi-entry:
+    main: MultiEntry.hs
+    source-dirs: examples
+    dependencies:
+    - concur-react
+  concur-react-hilo:
+    main: HiLo.hs
+    source-dirs: examples
+    dependencies:
+    - concur-react
+    - random
+  concur-react-menu:
+    main: Menu.hs
+    source-dirs: examples
+    dependencies:
+    - concur-react
+  concur-react-calculator:
+    main: Calc.hs
+    source-dirs: examples
+    dependencies:
+    - concur-react

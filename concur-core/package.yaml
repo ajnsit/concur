@@ -1,0 +1,32 @@
+name: concur-core
+version: '0.1.0.0'
+synopsis: A client side web UI framework for Haskell. Core framework.
+description: A client side web UI framework for Haskell. Core framework.
+category: Web
+author: Anupam Jain
+maintainer: ajnsit@gmail.com
+copyright: 2017 (C) All Rights Reserved.
+license: BSD3
+github: ajnsit/concur
+extra-source-files:
+- README.md
+ghc-options:
+- -Wall
+- -ferror-spans
+dependencies:
+- base >=4.7 && <5
+- mtl >=2.2
+- transformers >=0.5
+- stm >=2.4
+- free >=4.12
+- natural-transformation >=0.4
+library:
+  source-dirs: src
+  exposed-modules:
+  - Concur.Core
+  - Concur.Core.Types
+  - Concur.Core.Notify
+  - Concur.Core.Pipe
+  - Control.MonadSTM
+  - Control.MonadShiftMap
+  - Control.MultiAlternative

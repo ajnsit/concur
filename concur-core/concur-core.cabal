@@ -1,8 +1,13 @@
+-- This file has been generated from package.yaml by hpack version 0.17.1.
+--
+-- see: https://github.com/sol/hpack
+
 name:                concur-core
 version:             0.1.0.0
 synopsis:            A client side web UI framework for Haskell. Core framework.
 description:         A client side web UI framework for Haskell. Core framework.
-homepage:            https://github.com/ajnsit/concur (concur-core)
+homepage:            https://github.com/ajnsit/concur#readme
+bug-reports:         https://github.com/ajnsit/concur/issues
 license:             BSD3
 license-file:        LICENSE
 author:              Anupam Jain
@@ -10,28 +15,34 @@ maintainer:          ajnsit@gmail.com
 copyright:           2017 (C) All Rights Reserved.
 category:            Web
 build-type:          Simple
-extra-source-files:  README.md
-cabal-version:       >=1.10
+cabal-version:       >= 1.10
 
-library
-  ghc-options:         -Wall -ferror-spans
-  default-language:    Haskell2010
-  hs-source-dirs:      src
-  exposed-modules:     Concur.Core
-                     , Concur.Core.Types
-                     , Concur.Core.Notify
-                     , Concur.Core.Pipe
-                     , Control.MonadSTM
-                     , Control.MonadShiftMap
-                     , Control.MultiAlternative
-  build-depends:       base >= 4.7 && < 5
-                     , mtl >= 2.2
-                     , transformers >= 0.5
-                     , stm >= 2.4
-                     , free >= 4.12
-                     , natural-transformation >= 0.4
-  default-language:    Haskell2010
+extra-source-files:
+    README.md
 
 source-repository head
-  type:     git
+  type: git
   location: https://github.com/ajnsit/concur
+
+library
+  ghc-options: -Wall -ferror-spans
+  default-language: Haskell2010
+  hs-source-dirs:
+      src
+  exposed-modules:
+      Concur.Core
+      Concur.Core.Types
+      Concur.Core.Notify
+      Concur.Core.Pipe
+      Control.MonadSTM
+      Control.MonadShiftMap
+      Control.MultiAlternative
+  other-modules:
+      Paths_concur_core
+  build-depends:
+      base >=4.7 && <5
+    , mtl >=2.2
+    , transformers >=0.5
+    , stm >=2.4
+    , free >=4.12
+    , natural-transformation >=0.4
