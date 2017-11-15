@@ -7,6 +7,7 @@ import           GHCJS.Types                (JSString, JSVal)
 import qualified Data.JSString              as JSS
 
 import           Data.Void                  (Void, absurd)
+import           Text.Read                  (readMaybe)
 
 import           Control.Monad              (void, when)
 import           Concur.Core
@@ -96,10 +97,20 @@ button' attrs w = void $ elEvent' "onClick" "button" attrs w
 
 -- Text input. Returns the contents on keypress enter.
 inputEnter :: [VAttr] -> Widget HTML String
-inputEnter attrs = do
+inputEnter = inputEnterVal ""
+
+-- Text input. Returns the contents on keypress enter.
+inputEnterVal :: String -> [VAttr] -> Widget HTML String
+inputEnterVal curVal attrs = do
   n <- liftSTM newNotify
-  let attr = VAttr "onKeyDown" $ Right (handleKey n . unsafeCoerce)
-  effect [vleaf (unsafeCoerce ("input" :: JSString)) (attr:attrs)] $ await n
+  let evtattr = vevt "onKeyDown" (handleKey n . unsafeCoerce)
+  let valattr = vattr "defaultValue" (JSS.pack curVal)
+  effect [vleaf (unsafeCoerce ("input" :: JSString)) (evtattr:valattr:attrs)] $ await n
   where
     handleKey n = \e -> do
       atomically $ when (getProp "key" e == "Enter") $ notify n $! JSS.unpack $ getProp "value" $ getPropObj "target" e
+
+inputShowReadVal :: (Show a, Read a) => a -> Widget HTML a
+inputShowReadVal n =
+  readMaybe <$> inputEnterVal (show n) []
+  >>= maybe (inputShowReadVal n) return
