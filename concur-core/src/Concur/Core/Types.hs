@@ -17,6 +17,7 @@ module Concur.Core.Types
   , MultiAlternative(..)
   , loadWithIO
   , remoteWidget
+  , unsafeBlockingIO
   ) where
 
 import           Concur.Core.Notify       (Notify, await, newNotify, newNotifyIO, notify)
@@ -68,9 +69,10 @@ effect v m = widget v $ Just <$> m
 instance Monoid v => MonadSTM (Widget v) where
   liftSTM = effect mempty
 
--- NOTE: IMPORTANT: We strongly discourage BlockingIO being used by clients.
--- blockingIO :: IO a -> Widget v a
--- blockingIO = continue . BlockingIO
+-- | IMPORTANT: Blocking IO is dangerous as it can block the entire UI from updating.
+--   It should only be used for *very* quick running IO actions like creating MVars.
+unsafeBlockingIO :: Monoid v => IO a -> Widget v a
+unsafeBlockingIO io = continue $ Suspend $ fmap (SuspendF mempty Nothing . return . Just) io
 
 -- This is a safe use for blockingIO, and is exported
 awaitViewAction :: (Notify a -> v) -> Widget v a
