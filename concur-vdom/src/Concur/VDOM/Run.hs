@@ -46,4 +46,4 @@ runWidgetLoading (Widget w) root loading = do
         Free (Suspend io) -> liftIO io >>= \ws -> do
           void $ diff mnt (E.div () $ view ws) >>= patch mnt
           liftIO $ fromMaybe (return ()) $ runIO ws
-          liftIO (atomically $ fromMaybe w' <$> cont ws) >>= go mnt
+          liftIO (atomically $ fromMaybe (Free $ Suspend $ return ws) <$> cont ws) >>= go mnt

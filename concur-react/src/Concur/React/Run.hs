@@ -31,4 +31,4 @@ runWidget (Widget w) root = go w
           html <- mkReactParent (unsafeCoerce ("div" :: JSString)) <$> (bakeAttrs []) <*> (bakeReactHTML (view ws))
           renderReactDOM root html
           liftIO $ fromMaybe (return ()) $ runIO ws
-          liftIO (atomically $ fromMaybe w' <$> cont ws) >>= go
+          liftIO (atomically $ fromMaybe (Free $ Suspend $ return ws) <$> cont ws) >>= go
