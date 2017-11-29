@@ -2,6 +2,7 @@
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TupleSections              #-}
+{-# LANGUAGE KindSignatures             #-}
 module Concur.Core.Types
   ( Widget(..)
   , continue
@@ -13,9 +14,9 @@ module Concur.Core.Types
   , SuspendF(..)
   , Effect
   , effect
-  , awaitViewAction
   , MultiAlternative(..)
   , loadWithIO
+  , awaitIOAction
   , remoteWidget
   , unsafeBlockingIO
   ) where
@@ -30,28 +31,28 @@ import           Control.Monad.IO.Class   (MonadIO, liftIO)
 import           Control.MonadSTM         (MonadSTM (..))
 import           Control.MultiAlternative (MultiAlternative, orr, never)
 
-newtype Widget v a = Widget { suspend :: Free (Suspend v) a }
+newtype Widget v m a = Widget { suspend :: Free (Suspend v m) a }
   deriving (Functor, Applicative, Monad)
 
-data SuspendF v a = SuspendF { view :: v, cont :: Effect a }
+newtype Suspend v (m :: * -> *) a = Suspend { unSuspend :: m (SuspendF v m a) }
   deriving Functor
 
-newtype Suspend v a = Suspend { unSuspend :: IO (SuspendF v a) }
+data SuspendF v (m :: * -> *) a = SuspendF { view :: v, cont :: Effect a }
   deriving Functor
 
 type Effect a = STM (Maybe a)
 
-continue :: Suspend v a -> Widget v a
+continue :: Functor m => Suspend v m a -> Widget v m a
 continue = Widget . liftF
 
-widget :: v -> Effect a -> Widget v a
+widget :: Monad m => v -> Effect a -> Widget v m a
 widget v r = continue $ Suspend $ return $ SuspendF v r
 
-display :: v -> Widget v a
+display :: Monad m => v -> Widget v m a
 display v = widget v retry
 
 -- Change the view of a Widget
-mapView :: (u -> v) -> Widget u a -> Widget v a
+mapView :: Functor m => (u -> v) -> Widget u m a -> Widget v m a
 mapView f (Widget w) = Widget $ go w
   where
     go = hoistFree g
@@ -59,28 +60,28 @@ mapView f (Widget w) = Widget $ go w
     h (SuspendF v c) = SuspendF (f v) c
 
 -- Generic widget view wrapper
-wrapView :: Applicative f => (u -> v) -> Widget u a -> Widget (f v) a
+wrapView :: Functor m => Applicative f => (u -> v) -> Widget u m a -> Widget (f v) m a
 wrapView f = mapView (pure . f)
 
 -- A pure effect
-effect :: v -> STM a -> Widget v a
+effect :: Monad m => v -> STM a -> Widget v m a
 effect v m = widget v $ Just <$> m
 
-instance Monoid v => MonadSTM (Widget v) where
+instance (Monoid v, Monad m) => MonadSTM (Widget v m) where
   liftSTM = effect mempty
 
 -- | IMPORTANT: Blocking IO is dangerous as it can block the entire UI from updating.
 --   It should only be used for *very* quick running IO actions like creating MVars.
-unsafeBlockingIO :: Monoid v => IO a -> Widget v a
+unsafeBlockingIO :: Monoid v => IO a -> Widget v IO a
 unsafeBlockingIO io = continue $ Suspend $ fmap (SuspendF mempty . return . Just) io
 
 -- This is a safe use for blockingIO, and is exported
-awaitViewAction :: (Notify a -> v) -> Widget v a
-awaitViewAction f = continue $ Suspend $ do
+awaitIOAction :: (Notify a -> v) -> Widget v IO a
+awaitIOAction f = continue $ Suspend $ do
   n <- newNotifyIO
   return $ SuspendF (f n) (fmap Just (await n))
 
-loadWithIO :: v -> IO a -> Widget v a
+loadWithIO :: v -> IO a -> Widget v IO a
 loadWithIO v io = continue $ Suspend $ do
   n <- newNotifyIO
   _ <- forkIO $ io >>= atomically . notify n
@@ -95,7 +96,7 @@ remoteWidget d f = do
     proxy var = \a -> liftSTM $ notify var a
     wid var ui = orr [Left <$> ui, Right <$> (liftSTM $ await var)] >>= either return (wid var . f)
 
-instance Monoid v => MonadIO (Widget v) where
+instance Monoid v => MonadIO (Widget v IO) where
   liftIO = loadWithIO mempty
 
 -- IMPORTANT NOTE: This Alternative instance is NOT the same one as that for Free.
@@ -105,11 +106,11 @@ instance Monoid v => MonadIO (Widget v) where
 --         Right absorption (for <*>):  empty <*> a = empty
 --         Left distributivity (of fmap):  f <$> (a <|> b) = (f <$> a) <|> (f <$> b)
 --  OK     Left absorption (for fmap):  f <$> empty = empty
-instance Monoid v => Alternative (Widget v) where
+instance (Monad m, Monoid v) => Alternative (Widget v m) where
   empty = never
   f <|> g = orr [f,g]
 
-instance Monoid v => MultiAlternative (Widget v) where
+instance (Monad m, Monoid v) => MultiAlternative (Widget v m) where
   never = display mempty
   orr = Widget . comb . map suspend
     where
@@ -127,4 +128,4 @@ instance Monoid v => MultiAlternative (Widget v) where
             return $ fmap (\e -> comb $ take i wfs ++ [e] ++ drop (i+1) wfs) me
 
 -- The default instance derives from Alternative
-instance Monoid v => MonadPlus (Widget v)
+instance (Monad m, Monoid v) => MonadPlus (Widget v m)

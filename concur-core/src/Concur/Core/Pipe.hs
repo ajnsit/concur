@@ -61,7 +61,7 @@ instance MultiAlternative m => MultiAlternative (Pipe m a) where
   never = Pipe (const never) never
   orr ps = Pipe (\a -> orr (map (flip pipeIn a) ps)) (orr (map pipeOut ps))
 
-instance MonadShiftMap (Widget v) m => MonadShiftMap (Widget v) (Pipe m a) where
+instance MonadShiftMap (Widget v m1) m2 => MonadShiftMap (Widget v m1) (Pipe m2 a) where
   shiftMap f = shiftPipe (shiftMap f)
 
 -- Util: Function -> Kleisli
