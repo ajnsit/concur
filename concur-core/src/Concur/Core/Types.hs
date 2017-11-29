@@ -24,7 +24,7 @@ import           Concur.Core.Notify       (Notify, await, newNotify, newNotifyIO
 import           Control.Applicative      (Alternative, empty, (<|>))
 import           Control.Concurrent       (forkIO)
 import           Control.Concurrent.STM   (STM, atomically, retry)
-import           Control.Monad            (MonadPlus (..), void)
+import           Control.Monad            (MonadPlus (..))
 import           Control.Monad.Free       (Free (..), hoistFree, liftF)
 import           Control.Monad.IO.Class   (MonadIO, liftIO)
 import           Control.MonadSTM         (MonadSTM (..))
@@ -80,12 +80,11 @@ awaitViewAction f = continue $ Suspend $ do
   n <- newNotifyIO
   return $ SuspendF (f n) Nothing (fmap Just (await n))
 
-withNotifyS :: (Notify a -> SuspendF v a) -> Widget v a
-withNotifyS f = continue $ Suspend $ fmap f newNotifyIO
-
 loadWithIO :: v -> IO a -> Widget v a
-loadWithIO v io = withNotifyS $ \n ->
-    SuspendF v (Just $ void $ forkIO $ io >>= atomically . notify n) $ Just <$> await n
+loadWithIO v io = continue $ Suspend $ do
+  n <- newNotifyIO
+  _ <- forkIO $ io >>= atomically . notify n
+  return $ SuspendF v Nothing (Just <$> await n)
 
 -- Make a Widget, which can be pushed to remotely
 remoteWidget :: (MultiAlternative m, MonadSTM m, Monad m) => m b -> (a -> m b) -> STM (a -> m (), m b)
