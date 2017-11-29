@@ -15,7 +15,7 @@ import Concur.Core.Types (Widget, never)
 import Control.MultiAlternative
 import Control.MonadShiftMap
 
-import Control.Applicative (Alternative, (<|>), empty)
+import Control.Applicative (Alternative, (<|>))
 
 type Consumer m a = Pipe m a Void
 type Producer m b = Pipe m Void b
