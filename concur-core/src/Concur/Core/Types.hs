@@ -33,7 +33,7 @@ import           Control.MultiAlternative (MultiAlternative, orr, never)
 newtype Widget v a = Widget { suspend :: Free (Suspend v) a }
   deriving (Functor, Applicative, Monad)
 
-data SuspendF v a = SuspendF { view :: v, runIO :: Maybe (IO ()), cont :: Effect a }
+data SuspendF v a = SuspendF { view :: v, cont :: Effect a }
   deriving Functor
 
 newtype Suspend v a = Suspend { unSuspend :: IO (SuspendF v a) }
@@ -45,7 +45,7 @@ continue :: Suspend v a -> Widget v a
 continue = Widget . liftF
 
 widget :: v -> Effect a -> Widget v a
-widget v r = continue $ Suspend $ return $ SuspendF v Nothing r
+widget v r = continue $ Suspend $ return $ SuspendF v r
 
 display :: v -> Widget v a
 display v = widget v retry
@@ -56,7 +56,7 @@ mapView f (Widget w) = Widget $ go w
   where
     go = hoistFree g
     g (Suspend io) = Suspend $ fmap h io
-    h (SuspendF v r c) = SuspendF (f v) r c
+    h (SuspendF v c) = SuspendF (f v) c
 
 -- Generic widget view wrapper
 wrapView :: Applicative f => (u -> v) -> Widget u a -> Widget (f v) a
@@ -72,19 +72,19 @@ instance Monoid v => MonadSTM (Widget v) where
 -- | IMPORTANT: Blocking IO is dangerous as it can block the entire UI from updating.
 --   It should only be used for *very* quick running IO actions like creating MVars.
 unsafeBlockingIO :: Monoid v => IO a -> Widget v a
-unsafeBlockingIO io = continue $ Suspend $ fmap (SuspendF mempty Nothing . return . Just) io
+unsafeBlockingIO io = continue $ Suspend $ fmap (SuspendF mempty . return . Just) io
 
 -- This is a safe use for blockingIO, and is exported
 awaitViewAction :: (Notify a -> v) -> Widget v a
 awaitViewAction f = continue $ Suspend $ do
   n <- newNotifyIO
-  return $ SuspendF (f n) Nothing (fmap Just (await n))
+  return $ SuspendF (f n) (fmap Just (await n))
 
 loadWithIO :: v -> IO a -> Widget v a
 loadWithIO v io = continue $ Suspend $ do
   n <- newNotifyIO
   _ <- forkIO $ io >>= atomically . notify n
-  return $ SuspendF v Nothing (Just <$> await n)
+  return $ SuspendF v (Just <$> await n)
 
 -- Make a Widget, which can be pushed to remotely
 remoteWidget :: (MultiAlternative m, MonadSTM m, Monad m) => m b -> (a -> m b) -> STM (a -> m (), m b)
@@ -120,7 +120,7 @@ instance Monoid v => MultiAlternative (Widget v) where
         Left a -> pure a
         Right fsio -> Free $ Suspend $ do
           fs <- mapM unSuspend fsio
-          return $ SuspendF (mconcat $ map view fs) (mconcat $ fmap runIO fs) (merge $ map cont fs)
+          return $ SuspendF (mconcat $ map view fs) (merge $ map cont fs)
         where
           merge ws = do
             (i, me) <- foldl (\prev (i,w) -> prev <|> fmap (i,) w) retry $ zip [0..] ws
