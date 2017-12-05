@@ -25,16 +25,15 @@ import           Concur.Core
 import           Concur.VDOM.FFI
 
 -- | Captures window coordinates changes as they occur
-windowResize :: Monoid v => IO (Widget v (Int, Int))
+windowResize :: (Monad m, Monoid v) => IO (Widget v m (Int, Int))
 windowResize = do
-  n <- atomically newNotify
-  liftIO $ do
-    initSize <- (,) <$> windowInnerHeight <*> windowInnerWidth
-    atomically $ notify n initSize
-    windowAddEventListener "resize" =<< do
-      asyncCallback1 $ \windowEvent -> do
-        target <- getProp "target" (Object windowEvent)
-        Just w <- fromJSVal =<< getProp "innerWidth" (Object target)
-        Just h <- fromJSVal =<< getProp "innerHeight" (Object target)
-        atomically $ notify n (h, w)
+  n <- newNotifyIO
+  initSize <- (,) <$> windowInnerHeight <*> windowInnerWidth
+  atomically $ notify n initSize
+  windowAddEventListener "resize" =<< do
+    asyncCallback1 $ \windowEvent -> do
+      target <- getProp "target" (Object windowEvent)
+      Just w <- fromJSVal =<< getProp "innerWidth" (Object target)
+      Just h <- fromJSVal =<< getProp "innerHeight" (Object target)
+      atomically $ notify n (h, w)
   return $ liftSTM $ await n

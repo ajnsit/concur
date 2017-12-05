@@ -60,9 +60,9 @@ toArrows set =
         (_,_)         -> 0
  }
 
-keyboard :: Monoid v => IO (Widget v (Set Int))
+keyboard :: (Monad m, Monoid v) => IO (Widget v m (Set Int))
 keyboard = do
-  n <- atomically newNotify
+  n <- newNotifyIO
   kset <- atomically $ newTVar (S.empty)
   windowAddEventListener "keyup" =<< keyUpCallback n kset
   windowAddEventListener "keydown" =<< keyDownCallback n kset
@@ -86,5 +86,5 @@ keyboard = do
           notify n newKeys
 
 -- | Maps `Arrows` onto a Keyboard subscription
-arrows :: Monoid v => IO (Widget v Arrows)
+arrows :: (Monad m, Monoid v) => IO (Widget v m Arrows)
 arrows = fmap toArrows <$> keyboard

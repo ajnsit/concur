@@ -26,13 +26,12 @@ import           Concur.VDOM.FFI
 
 -- | Captures mouse coordinates as they occur and writes them to
 -- an event sink
-mouseMove :: Monoid v => IO (Widget v (Int,Int))
+mouseMove :: (Monad m, Monoid v) => IO (Widget v m (Int,Int))
 mouseMove = do
-  n <- atomically newNotify
-  liftIO $ do
-    windowAddEventListener "mousemove" =<< do
-      asyncCallback1 $ \mouseEvent -> do
-        Just x <- fromJSVal =<< getProp "clientX" (Object mouseEvent)
-        Just y <- fromJSVal =<< getProp "clientY" (Object mouseEvent)
-        atomically $ notify n (x,y)
+  n <- newNotifyIO
+  windowAddEventListener "mousemove" =<< do
+    asyncCallback1 $ \mouseEvent -> do
+      Just x <- fromJSVal =<< getProp "clientX" (Object mouseEvent)
+      Just y <- fromJSVal =<< getProp "clientY" (Object mouseEvent)
+      atomically $ notify n (x,y)
   return $ liftSTM $ await n

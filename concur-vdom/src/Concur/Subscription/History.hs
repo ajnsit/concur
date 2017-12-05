@@ -92,12 +92,12 @@ chan :: Notify URI
 chan = unsafePerformIO newNotifyIO
 
 -- | Captures `popState` events, from the History API
-uri :: Monoid v => IO (Widget v URI)
+uri :: Monoid v => Widget v IO URI
 uri = do
-  liftIO $ onPopState =<< do
+  unsafeBlockingIO $ onPopState =<< do
     asyncCallback $ do
       getURI >>= atomically . notify chan
-  return $ liftSTM $ await chan
+  liftSTM $ await chan
 
 foreign import javascript unsafe "window.history.go($1);"
   goURI' :: Int -> IO ()

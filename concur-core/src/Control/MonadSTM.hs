@@ -12,5 +12,5 @@ class MonadSTM m where
 instance MonadSTM IO where
   liftSTM = atomically
 
-instance (MonadTrans t, Monad m, MonadSTM m) => MonadSTM (t m) where
+instance {-# OVERLAPPABLE #-} (MonadTrans t, Monad m, MonadSTM m) => MonadSTM (t m) where
   liftSTM = lift . liftSTM

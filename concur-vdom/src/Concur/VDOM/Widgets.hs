@@ -32,7 +32,7 @@ import qualified GHCJS.VDOM.Event              as Ev
 
 -- Global mouse click notifications
 -- Sets up the click handler once and then return a Widget that listens to it
-documentClickNotifications :: Monoid v => IO (Widget v (Int,Int))
+documentClickNotifications :: (Monad m, Monoid v) => IO (Widget v m (Int,Int))
 documentClickNotifications = do
   n <- atomically newNotify
   doc <- currentDocumentUnchecked
@@ -42,7 +42,7 @@ documentClickNotifications = do
   return $ listenNotify n
 
 -- Global Keyboard notifications
-keyboardNotifications :: Monoid v => IO (Widget v Word)
+keyboardNotifications :: (Monad m, Monoid v) => IO (Widget v m Word)
 keyboardNotifications = do
   n <- atomically newNotify
   doc <- currentDocumentUnchecked
@@ -52,15 +52,15 @@ keyboardNotifications = do
   return $ listenNotify n
 
 -- Returns a widget which waits for a Notification to happen
-listenNotify :: Monoid v => Notify a -> Widget v a
+listenNotify :: (Monad m, Monoid v) => Notify a -> Widget v m a
 listenNotify = liftSTM . await
 
 -- An example of a completely IO widget
 -- Waits for the specified number of milliseconds
-delay :: Monoid v => Int -> Widget v ()
+delay :: Monoid v => Int -> Widget v IO ()
 delay i = liftIO $ threadDelay (i*1000)
 
-interval :: Monoid v => Int -> IO (Widget v UTCTime)
+interval :: (Monad m, Monoid v) => Int -> IO (Widget v m UTCTime)
 interval i = do
   n <- atomically newNotify
   -- TODO: Kill Thread at some point. Use Weak TVars for it
@@ -68,18 +68,18 @@ interval i = do
   return $ listenNotify n
 
 -- Text display widget
-text :: String -> Widget HTML a
+text :: Applicative m => String -> Widget HTML m a
 text s = display [E.text $ JSS.pack s]
 
 -- A clickable button widget
-button :: String -> Widget HTML ()
-button s = void $ awaitViewAction $ \n -> [E.button [Ev.click (atomically . notify n)] [E.text $ JSS.pack s]]
+button :: Applicative m => String -> Widget HTML IO ()
+button s = void $ awaitSTMAction $ \n -> [E.button [Ev.click (atomically . notify n)] [E.text $ JSS.pack s]]
 
-button' :: [A.Attribute] -> String -> Widget HTML ()
-button' a s = void $ awaitViewAction $ \n -> [E.button (Ev.click (atomically . notify n) : a) [E.text $ JSS.pack s]]
+button' :: [A.Attribute] -> String -> Widget HTML IO ()
+button' a s = void $ awaitSTMAction $ \n -> [E.button (Ev.click (atomically . notify n) : a) [E.text $ JSS.pack s]]
 
 -- An Element which can be clicked
-clickEl :: HTMLNodeName [A.Attribute] -> [A.Attribute] -> (Ev.MouseEvent -> a) -> [Widget HTML a] -> Widget HTML a
+clickEl :: HTMLNodeName [A.Attribute] -> [A.Attribute] -> (Ev.MouseEvent -> a) -> [Widget HTML m a] -> Widget HTML m a
 clickEl e attrs onClick children = either onClick id <$> elEvent Ev.click e attrs (orr children)
 
 -- Handle arbitrary events on an element.
@@ -87,8 +87,8 @@ clickEl e attrs onClick children = either onClick id <$> elEvent Ev.click e attr
 elEvent :: ((a -> IO ()) -> A.Attribute)
         -> HTMLNodeName [A.Attribute]
         -> [A.Attribute]
-        -> Widget HTML b
-        -> Widget HTML (Either a b)
+        -> Widget HTML m b
+        -> Widget HTML m (Either a b)
 elEvent evt e attrs w = do
   n <- liftSTM newNotify
   let wEvt = listenNotify n
@@ -96,7 +96,7 @@ elEvent evt e attrs w = do
   fmap Left wEvt <|> fmap Right child
 
 -- Text input. Returns the contents on keypress enter.
-inputEnter :: [A.Attribute] -> Widget HTML String
+inputEnter :: [A.Attribute] -> Widget HTML m String
 inputEnter attrs = do
   n <- liftSTM newNotify
   let handleKeypress e = when (Ev.key e == "Enter") $ atomically $ notify n $ JSS.unpack $ Ev.inputValue e
@@ -106,17 +106,15 @@ inputEnter attrs = do
 -- Text input. Returns the contents on every change.
 -- This allows setting the value of the textbox, however
 --  it suffers from the usual virtual-dom lost focus problem :(
-input :: String -> Widget HTML String
-input def = do
-  n <- liftSTM newNotify
-  let txt = E.input (A.value $ JSS.pack def, Ev.input (atomically . notify n . JSS.unpack . Ev.inputValue)) ()
-  effect [txt] $ await n
+input :: String -> Widget HTML IO String
+input def = awaitSTMAction $ \n ->
+    [E.input (A.value $ JSS.pack def, Ev.input (atomically . notify n . JSS.unpack . Ev.inputValue)) ()]
 
 -- Text input. Returns the contents on keypress enter.
 -- This one does not allow setting the value of the textbox, however
 --  this does not suffer from the virtual-dom lost focus problem, as
 --  the vdom representation of the textbox never changes
-mkInput :: STM (Widget HTML String)
+mkInput :: STM (Widget HTML m String)
 mkInput = do
   n <- newNotify
   let txt = E.input (Ev.input (atomically . notify n . JSS.unpack . Ev.inputValue)) ()
@@ -125,7 +123,7 @@ mkInput = do
 -- A custom widget. An input field with a button.
 -- When the button is pressed, the value of the input field is returned.
 -- Note the use of local state to store the input value
-inputWithButton :: String -> String -> Widget HTML String
+inputWithButton :: String -> String -> Widget HTML m String
 inputWithButton label def = do
   inp <- liftSTM mkInput
   flip execStateT def $ go inp
@@ -136,15 +134,15 @@ inputWithButton label def = do
     w inp = fmap Left (lift inp) <|> lift (text " ") <|> fmap Right (lift $ button label)
 
 -- A Checkbox
-checkbox :: Bool -> Widget HTML Bool
-checkbox checked = awaitViewAction $ \n -> [E.input (Ev.click (const $ atomically $ notify n (not checked))) ()]
+checkbox :: Bool -> Widget HTML IO Bool
+checkbox checked = awaitSTMAction $ \n -> [E.input (Ev.click (const $ atomically $ notify n (not checked))) ()]
 
 -- Generic Element wrapper (single child widget)
-el_ :: MonadShiftMap (Widget HTML) m => HTMLNodeName [A.Attribute] -> [A.Attribute] -> m a -> m a
+-- el_ :: MonadShiftMap (Widget HTML n) m => HTMLNodeName [A.Attribute] -> [A.Attribute] -> m a -> m a
 el_ e attrs = shiftMap (wrapView (e attrs))
 
 -- Generic Element wrapper
-el :: (MonadShiftMap (Widget HTML) m, MultiAlternative m) => HTMLNodeName [A.Attribute] -> [A.Attribute] -> [m a] -> m a
+-- el :: (MonadShiftMap (Widget HTML n) m, MultiAlternative m) => HTMLNodeName [A.Attribute] -> [A.Attribute] -> [m a] -> m a
 el e attrs = shiftMap (wrapView (e attrs)) . orr
 
 -- Utility to easily create class attributes

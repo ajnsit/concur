@@ -1,4 +1,4 @@
--- This file has been generated from package.yaml by hpack version 0.17.1.
+-- This file has been generated from package.yaml by hpack version 0.18.1.
 --
 -- see: https://github.com/sol/hpack
 
@@ -38,6 +38,7 @@ library
       Control.MonadShiftMap
       Control.MultiAlternative
   other-modules:
+      Concur.Core.Widgets
       Paths_concur_core
   build-depends:
       base >=4.7 && <5
