@@ -22,6 +22,8 @@ It has two backends -
 
 2. [Virtual-Dom](https://github.com/Matt-Esch/virtual-dom) based, called [concur-vdom](concur-vdom). You can use the [Concur-Vdom Quickstart Template](https://github.com/concurhaskell/concur-vdom-starter) to quickly get started.
 
+#### EDIT: [zyla](https://github.com/zyla) has also started a [port of Concur to Purescript](https://github.com/zyla/purescript-concur) which already works for some things!
+
 There are more backends in the works, including one for [React-Native](https://github.com/facebook/react-native), and for Native UI toolkits like [FLTK](https://github.com/deech/fltkhs).
 
 There is a Work-In-Progress Extremely-Experimental backend called [concur-doom](concur-doom) which explores constructing DOM elements once and then editing only the parts that change, without dom-diffing, and while maintaining pure view rendering as well as having the same API as the other virtual-dom based backends.
