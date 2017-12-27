@@ -27,11 +27,20 @@ data DomTree c
   | DomLeaf !String ![DomAttr]
   | DomText !String
   | DomNil
-  deriving (Eq, Functor)
+  deriving (Show, Eq, Functor)
 
 -- Instances that cannot be derived in a generic fashion
-instance Eq (Expr DomTree) where
+instance Eq DomExpr where
   (==) (Expr t1) (Expr t2) = t1 == t2
+
+instance Show DomExpr where
+  show (Expr t1) = show t1
+
+instance Show DomEdit where
+  show (Expr t1) = show t1
+
+instance Show DomState where
+  show (Expr t1) = show t1
 
 -- Type aliases for Dom Expressions
 type DomExpr  = Expr DomTree
@@ -40,22 +49,22 @@ type DomState = EditState DomTree
 
 -------------------------------------------------------------------------------
 -- Constructors
-elText :: String -> Expr DomTree
+elText :: String -> DomExpr
 elText s = Expr (DomText s)
 
-elList :: String -> [DomAttr] -> [Expr DomTree] -> Expr DomTree
+elList :: String -> [DomAttr] -> [DomExpr] -> DomExpr
 elList n a c = Expr (DomList n a c)
 
-elKeys :: String -> [DomAttr] -> IntMap (Expr DomTree) -> Expr DomTree
+elKeys :: String -> [DomAttr] -> IntMap (DomExpr) -> DomExpr
 elKeys n a c = Expr (DomKeys n a c)
 
-elLeaf :: String -> [DomAttr] -> Expr DomTree
+elLeaf :: String -> [DomAttr] -> DomExpr
 elLeaf n a = Expr (DomLeaf n a)
 
 -------------------------------------------------------------------------------
--- Sample
-sample :: Expr DomTree
-sample = elList "div" []
+-- Sample trees
+sample1 :: DomExpr
+sample1 = elList "div" []
   [ elList "h1" [] [elText "Hello Sample!"]
   , elList "p" []
     [ elList "h2" [] [elText "This is a paragraph heading"]
@@ -65,6 +74,23 @@ sample = elList "div" []
       ]
     ]
   ]
+
+sample2 :: DomExpr
+sample2 = elList "div" []
+  [ elList "h2" [] [elText "Hello NEW Sample!"]
+  , elList "p" []
+    [ elList "h2" [] [elText "This is a paragraph heading"]
+    , elList "p" [] [elText "Enter some info in the textbox below -"]
+    , elList "p" []
+      [ elLeaf "input" [("type", "text")]
+      ]
+    ]
+  ]
+
+-- Sample edit ops
+-- Delete the first child of the top level div
+sampleEdit1 :: DomEdit
+sampleEdit1 = eEdit $ DomList "h1" [] [ eDel ]
 
 -------------------------------------------------------------------------------
 -- Ops on DomTrees
@@ -81,14 +107,14 @@ fetchAttrs (DomLeaf _ a)   = a
 fetchAttrs _               = []
 
 -------------------------------------------------------------------------------
--- Comparing Expr DomTrees
-sameTopLevelData :: Expr DomTree -> Expr DomTree -> Bool
+-- Comparing DomExprs
+sameTopLevelData :: DomExpr -> DomExpr -> Bool
 sameTopLevelData l1 l2 = sameTopLevelTag l1 l2 && sameTopLevelAttrs l1 l2
 
-sameTopLevelTag :: Expr DomTree -> Expr DomTree -> Bool
+sameTopLevelTag :: DomExpr -> DomExpr -> Bool
 sameTopLevelTag l1 l2 = fetchTag (unExpr l1) == fetchTag (unExpr l2)
 
-sameTopLevelAttrs :: Expr DomTree -> Expr DomTree -> Bool
+sameTopLevelAttrs :: DomExpr -> DomExpr -> Bool
 sameTopLevelAttrs l1 l2 = fetchAttrs (unExpr l1) == fetchAttrs (unExpr l2)
 
 

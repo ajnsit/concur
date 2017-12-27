@@ -8,6 +8,7 @@ type DomAttr = (String, String)
 -- Attribute Modifications
 -- Either del or set
 newtype DomAttrOp = DomAttrOp { unDomAttrOp :: [Either String DomAttr] }
+  deriving (Show, Eq)
 
 diffAttr :: [DomAttr] -> [DomAttr] -> DomAttrOp
 diffAttr l1 l2 = DomAttrOp $ as ++ bs
