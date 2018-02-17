@@ -22,7 +22,7 @@ It has two backends -
 
 2. [Virtual-Dom](https://github.com/Matt-Esch/virtual-dom) based, called [concur-vdom](concur-vdom). You can use the [Concur-Vdom Quickstart Template](https://github.com/concurhaskell/concur-vdom-starter) to quickly get started.
 
-#### EDIT: [zyla](https://github.com/zyla) has also started a [port of Concur to Purescript](https://github.com/zyla/purescript-concur) which already works for some things!
+#### EDIT: I have started working on a new [port of Concur to Purescript](https://github.com/ajnsit/purescript-concur) which already works (only with the React backend)! I now need to port all the Concur examples to it, and refine the API a bit.
 
 There are more backends in the works, including one for [React-Native](https://github.com/facebook/react-native), and for Native UI toolkits like [FLTK](https://github.com/deech/fltkhs).
 
