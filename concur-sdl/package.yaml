@@ -1,0 +1,40 @@
+name: concur-sdl
+version: '0.1.0.0'
+synopsis: A UI framework for Haskell. SDL bindings.
+description: A UI framework for Haskell. SDL bindings.
+category: Web
+author: Anupam Jain
+maintainer: ajnsit@gmail.com
+copyright: 2017 (C) All Rights Reserved.
+license: BSD3
+github: ajnsit/concur
+extra-source-files:
+- README.md
+
+ghc-options:
+- -Wall
+- -ferror-spans
+
+dependencies:
+- base >=4.7 && <5
+- mtl >=2.2
+- transformers >=0.5
+- stm >=2.4
+- free >=4.12
+- concur-core
+- sdl2
+
+library:
+  source-dirs: src
+  exposed-modules:
+  - Concur.SDL
+  - Concur.SDL.Painter
+  - Concur.SDL.Widgets
+  - Concur.SDL.Run
+
+executables:
+  concur-sdl-example:
+    main: Hello.hs
+    source-dirs: examples
+    dependencies:
+    - concur-sdl

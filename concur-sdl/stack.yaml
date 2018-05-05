@@ -1,0 +1,13 @@
+resolver: lts-7.19
+packages:
+- .
+- ../concur-core
+extra-deps:
+- natural-transformation-0.4
+- sdl2-2.3.0
+flags: {}
+extra-package-dbs: []
+
+nix:
+  enable: false
+  packages: [ SDL2 ]
