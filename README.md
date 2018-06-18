@@ -16,6 +16,8 @@
 
 A brand new client side Web UI framework for Haskell that explores an entirely new paradigm. It does not follow FRP (think Reflex or Reactive Banana), or Elm architecture, but aims to combine the best parts of both.
 
+Work in progress tutorials are published in the [Concur Documentation site](https://github.com/ajnsit/concur-documentation/blob/master/README.md)
+
 It has two backends -
 
 1. [React](https://github.com/facebook/react) based, called [concur-react](concur-react). You can use the [Concur-React Quickstart Template](https://github.com/concurhaskell/concur-react-starter) to quickly get started.
