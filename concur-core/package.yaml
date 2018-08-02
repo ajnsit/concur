@@ -1,8 +1,8 @@
 name: concur-core
 version: '0.1.0.0'
-synopsis: A client side web UI framework for Haskell. Core framework.
-description: A client side web UI framework for Haskell. Core framework.
-category: Web
+synopsis: A UI framework for Haskell. Core framework.
+description: A UI framework for Haskell. Core framework.
+category: User Interfaces
 author: Anupam Jain
 maintainer: ajnsit@gmail.com
 copyright: 2017 (C) All Rights Reserved.

@@ -2,12 +2,12 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 17db59d45076972dd7ba6d55b12cc5b23efd0eece58a6a855284b6f1f7e8fff8
+-- hash: 4c2348da8406f8f11791d3b879d7bb9101d32d45f6a2c89da65bbad039d11acd
 
 name:                concur-core
 version:             0.1.0.0
-synopsis:            A client side web UI framework for Haskell. Core framework.
-description:         A client side web UI framework for Haskell. Core framework.
+synopsis:            A UI framework for Haskell. Core framework.
+description:         A UI framework for Haskell. Core framework.
 homepage:            https://github.com/ajnsit/concur#readme
 bug-reports:         https://github.com/ajnsit/concur/issues
 license:             BSD3
@@ -15,7 +15,7 @@ license-file:        LICENSE
 author:              Anupam Jain
 maintainer:          ajnsit@gmail.com
 copyright:           2017 (C) All Rights Reserved.
-category:            Web
+category:            User Interfaces
 build-type:          Simple
 cabal-version:       >= 1.10
 extra-source-files:
