@@ -33,9 +33,10 @@ It has two backends -
 
 Access some performance benchmarks here - https://ajnsit.github.io/concur-benchmarks/
 
-## Purescript version
+## Ports to other languages
 
-There is also a port of [Concur for purescript](https://github.com/ajnsit/purescript-concur) that's well maintained.
+1. [Concur for Purescript](https://github.com/ajnsit/purescript-concur) - An official port to Purescript which is well maintained.
+2. [Concur for Javascript](https://github.com/ajnsit/concur-js) - An official but experimental port to Javascript.
 
 ## Examples
 
