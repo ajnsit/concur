@@ -1,23 +1,24 @@
--- This file has been generated from package.yaml by hpack version 0.28.2.
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.1.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4c2348da8406f8f11791d3b879d7bb9101d32d45f6a2c89da65bbad039d11acd
+-- hash: 7da6cb0f4c4ea760353008287709d9841439933f3d2b83fcc4ef30dd8090db79
 
-name:                concur-core
-version:             0.1.0.0
-synopsis:            A UI framework for Haskell. Core framework.
-description:         A UI framework for Haskell. Core framework.
-homepage:            https://github.com/ajnsit/concur#readme
-bug-reports:         https://github.com/ajnsit/concur/issues
-license:             BSD3
-license-file:        LICENSE
-author:              Anupam Jain
-maintainer:          ajnsit@gmail.com
-copyright:           2017 (C) All Rights Reserved.
-category:            User Interfaces
-build-type:          Simple
-cabal-version:       >= 1.10
+name:           concur-core
+version:        0.1.0.0
+synopsis:       A UI framework for Haskell. Core framework.
+description:    A UI framework for Haskell. Core framework.
+category:       User Interfaces
+homepage:       https://github.com/ajnsit/concur#readme
+bug-reports:    https://github.com/ajnsit/concur/issues
+author:         Anupam Jain
+maintainer:     ajnsit@gmail.com
+copyright:      2017 (C) All Rights Reserved.
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
 extra-source-files:
     README.md
 
@@ -26,23 +27,21 @@ source-repository head
   location: https://github.com/ajnsit/concur
 
 library
-  ghc-options: -Wall -ferror-spans
-  default-language: Haskell2010
-  hs-source-dirs:
-      src
   exposed-modules:
       Concur.Core
       Concur.Core.Types
       Concur.Core.Notify
-      Control.MonadSTM
       Control.ShiftMap
       Control.MultiAlternative
   other-modules:
       Paths_concur_core
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -ferror-spans
   build-depends:
       base >=4.7 && <5
     , free >=4.12
     , mtl >=2.2
     , natural-transformation >=0.4
-    , stm >=2.4
     , transformers >=0.5
+  default-language: Haskell2010

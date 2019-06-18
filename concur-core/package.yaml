@@ -17,7 +17,6 @@ dependencies:
 - base >=4.7 && <5
 - mtl >=2.2
 - transformers >=0.5
-- stm >=2.4
 - free >=4.12
 - natural-transformation >=0.4
 library:
@@ -26,6 +25,5 @@ library:
   - Concur.Core
   - Concur.Core.Types
   - Concur.Core.Notify
-  - Control.MonadSTM
   - Control.ShiftMap
   - Control.MultiAlternative
