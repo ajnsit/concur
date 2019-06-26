@@ -117,25 +117,40 @@ instance Monoid v => Alternative (Widget v) where
   empty = never
   f <|> g = orr [f,g]
 
--- TODO: orr single child threadless/fast path
+stepW :: v -> Free (SuspendF v) a -> IO (Either a (v, Maybe (IO (Free (SuspendF v) a))))
+stepW _ (Free (StepView v next))  = stepW v next
+stepW v (Free (StepIO a next))    = a >>= stepW v . next
+stepW v (Free (StepBlock a next)) = pure $ Right (v, Just (a >>= pure . next))
+stepW v (Free Forever)            = pure $ Right (v, Nothing)
+stepW _ (Pure a)                  = pure $ Left a
+  
 
 instance Monoid v => MultiAlternative (Widget v) where
   never = display mempty
+
+  -- Single child fast path without threads
+  orr [w] = go (step w)
+    where
+      go widget = do
+        stepped <- io $ stepW mempty widget
+
+        case stepped of
+          Left a                -> pure a
+          Right (v, Nothing)    -> view v >> forever
+          Right (v, Just await) -> do
+            view v
+            next <- effect await
+            go next
+
+  -- General threaded case
   orr ws = do
     mvar <- io newEmptyMVar
     comb mvar $ fmap (Left . step) ws
     where
-      go :: v -> Free (SuspendF v) a -> IO (Either a (v, Maybe (IO (Free (SuspendF v) a))))
-      go _ (Free (StepView v next))  = go v next
-      go v (Free (StepIO a next))    = a >>= go v . next
-      go v (Free (StepBlock a next)) = pure $ Right (v, Just (a >>= pure . next))
-      go v (Free Forever)            = pure $ Right (v, Nothing)
-      go _ (Pure a)                  = pure $ Left a
-  
       comb :: MVar (Int, Free (SuspendF v) a) -> [Either (Free (SuspendF v) a) (v, Maybe ThreadId)] -> Widget v a
       comb mvar widgets = do
         stepped <- io $ forM widgets $ \w -> case w of
-          Left suspended         -> either Left (Right . Left) <$> go mempty suspended
+          Left suspended         -> either Left (Right . Left) <$> stepW mempty suspended
           Right (displayed, tid) -> pure $ Right $ Right (displayed, tid)
   
         case sequence stepped of
