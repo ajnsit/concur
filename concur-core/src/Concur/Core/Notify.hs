@@ -6,8 +6,7 @@ module Concur.Core.Notify
   , newNotify
   ) where
 
-import           Control.Concurrent
-import           Control.Monad          (void)
+import Control.Concurrent
 
 -- TODO: Use Weak TVar pointers as appropriate
 newtype Notify a = Notify (MVar a)
@@ -19,7 +18,7 @@ await :: Notify a -> IO a
 await (Notify v) = takeMVar v
 
 notify :: Notify a -> a -> IO ()
-notify (Notify v) a = void (putMVar v a)
+notify (Notify v) a = putMVar v a
 
 newNotify :: IO (Notify a)
 newNotify = Notify <$> newEmptyMVar
