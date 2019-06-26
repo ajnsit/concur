@@ -123,7 +123,6 @@ stepW v (Free (StepIO a next))    = a >>= stepW v . next
 stepW v (Free (StepBlock a next)) = pure $ Right (v, Just (a >>= pure . next))
 stepW v (Free Forever)            = pure $ Right (v, Nothing)
 stepW _ (Pure a)                  = pure $ Left a
-  
 
 instance Monoid v => MultiAlternative (Widget v) where
   never = display mempty
