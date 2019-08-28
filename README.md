@@ -27,7 +27,7 @@ It has two backends -
 
     An example of using Native React Widgets is here - [Drag Drop Sortable List Widget (React)](https://github.com/concurhaskell/concur-react-sortable-tree/blob/master/src/Main.hs) - [Demo](https://ajnsit.github.io/concur/examples/sortable-tree-example.jsexe/index.html) - Demonstrates Concur binding to [React-Sortable-Tree](https://github.com/fritz-c/react-sortable-tree).
 
-2. [Virtual-Dom](https://github.com/Matt-Esch/virtual-dom) based, called [concur-vdom](concur-vdom). You can use the [Concur-Vdom Quickstart Template](https://github.com/concurhaskell/concur-vdom-starter) to quickly get started.
+2. [Virtual-Dom](https://github.com/Matt-Esch/virtual-dom) based, called [concur-vdom](concur-vdom). (**Bitrotten**). You can use the [Concur-Vdom Quickstart Template](https://github.com/concurhaskell/concur-vdom-starter) to quickly get started.
 
 ## Performance
 
